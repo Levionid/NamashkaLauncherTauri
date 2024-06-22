@@ -14,208 +14,49 @@
   --button-hover-color: #5DD578;
   --shadow-color: rgba(0, 0, 0, 0.25);
   --header-height: 53px;
-}
-
-main {
-  display: flex;
-  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
 }
 
 body {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
   background-color: var(--background-color);
   margin: 0;
   overflow: hidden;
   z-index: -1;
 }
 
-.titlebar {
-  width: 100vw;
-  height: var(--header-height);
-  background-color: var(--header-color);
-  box-shadow: 0 4px 4px var(--shadow-color);
-  display: flex;
-  justify-content: flex-end;
+.border-top {
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
-  user-select: none;
-  z-index: 1;
+  width: 100vw;
+  height: 1px;
+  background-color: #121416;
+  z-index: 2;
 }
 
-.titlebar-box {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  left: 0;
-  height: var(--header-height);
-}
-
-.titlebar-image {
-  height: 45px;
-  margin: 5px;
-}
-
-.titlebar-name {
-  color: #fff;
-  font-size: 28px;
-  text-shadow: 0 4px 4px var(--shadow-color);
-}
-
-.titlebar-button-minimize {
-  width: 40px;
-  height: 29px;
-  background-color: #212429;
-  transition: 0.3s;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 4px;
-}
-
-.titlebar-button-minimize:hover {
-  background-color: #2D3239;
-}
-
-.titlebar-button-minimize span {
-  color: #fff;
-  font-size: 34px;
-  margin-bottom: 6px;
-  text-shadow: 0 4px 4px var(--shadow-color);
-}
-
-.titlebar-button-close {
-  width: 40px;
-  height: 29px;
-  background-color: #BD2626;
-  border-radius: 10px 0px 0 10px;
-  box-shadow: 0 4px 4px var(--shadow-color);
-  transition: 0.3s;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.titlebar-button-close:hover {
-  background-color: #D94040;
-}
-
-.namashka-craft-tab {
-  position: absolute;
-  right: 0;
-  top: var(--header-height);
-  width: 30.21vw;
-  height: calc(100vh - var(--header-height));
-  background-color: var(--tab-background-color);
-  box-shadow: -4px 0 4px var(--shadow-color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 0;
-}
-
-.namashka-craft{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.namashka-craft-tab-image {
-  border-radius: 15px;
-  width: 25.9vw;
-  height: 26vh;
-  box-shadow: 0 4px 4px var(--shadow-color);
-  margin-top: 4.1vh;
-  margin-bottom: 0.6vh;
-}
-
-.namashka-craft-name {
-  color: var(--text-color);
-  font-size: 28px;
-  text-shadow: 0 4px 4px var(--shadow-color);
-  margin-bottom: 1vh;
-  width: 22.08vw;
-  height: 5.37vh;
-}
-
-.namashka-craft-description {
-  color: var(--secondary-text-color);
-  font-size: 13px;
-  text-shadow: 0 4px 4px var(--shadow-color);
-}
-
-.namashka-craft-nickname {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: 13.21vh;
-}
-
-.namashka-craft-nickname-text {
-  color: var(--nickname-text-color);
-  font-size: 12px;
-}
-
-.namashka-craft-nickname-input-box {
-  width: 11.8vw;
-  height: 3.52vh;
-  background-color: var(--input-background-color);
-  border-radius: 3px;
-  color: var(--input-text-color);
-  text-align: center;
-  font-size: 14px;
-  border: none;
-}
-
-.namashka-craft-play-button {
-  margin-top: 1.11vh;
-  width: 12.5vw;
-  height: 6.48vh;
-  background-color: var(--button-background-color);
-  border-radius: 10px;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.3s;
-  cursor: pointer;
-  text-shadow: 0 4px 4px var(--shadow-color);
-  font-size: 28px;
-  color: var(--text-color);
-  cursor: pointer;
-}
-
-.namashka-craft-play-button:hover {
-  background: var(--button-hover-color);
-}
-
-.buttons {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.border-bottom {
+  position: fixed;
   bottom: 0;
+  width: 100vw;
+  height: 1px;
+  background-color: #121416;
+  z-index: 2;
+}
+
+.border-left {
+  position: fixed;
+  left: 0;
+  width: 1px;
+  height: 100vh;
+  background-color: #121416;
+  z-index: 2;
+}
+
+.border-right {
+  position: fixed;
   right: 0;
-}
-
-.settings-button {
-  width: 2vw;
-  height: 3.7vh;
-  cursor: pointer;
-  padding: 2px;
-}
-
-.folder-button {
-  width: 2vw;
-  height: 3.7vh;
-  cursor: pointer;
-  padding: 2px;
-}
-
-.green-text {
-  color: var(--green-color);
+  width: 1px;
+  height: 100vh;
+  background-color: #121416;
+  z-index: 2;
 }

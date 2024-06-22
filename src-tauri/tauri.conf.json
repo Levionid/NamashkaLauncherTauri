@@ -3,13 +3,7 @@
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:5173",
-    "distDir": "../dist",
-    "resources": [
-      {
-        "glob": "**",
-        "dir": "resources"
-      }
-    ]
+    "distDir": "../dist"
   },
   "package": {
     "productName": "Namashka Launcher",
@@ -28,6 +22,9 @@
         "unmaximize": false,
         "unminimize": true,
         "startDragging": true
+      },
+      "shell": {
+        "execute": true
       }
     },
     "bundle": {
@@ -51,7 +48,7 @@
         "signingIdentity": null
       },
       "resources": [
-        "../src-tauri/assets/namashkaCraftTabImage.png"
+        "assets/*"
       ],
       "shortDescription": "",
       "targets": "all",
