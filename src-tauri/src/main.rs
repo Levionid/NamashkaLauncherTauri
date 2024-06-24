@@ -9,7 +9,7 @@ use std::fs;
 fn open_explorer() {
     if cfg!(target_os = "windows") {
         Command::new("explorer.exe")
-            .arg("./")
+            .arg(".")
             .spawn()
             .expect("Failed to open explorer");
     }
@@ -30,9 +30,14 @@ fn start_minecraft_loader() -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn check_launcher_options() -> bool {
+    fs::metadata("launcherOptions.json").is_ok()
+}
+
 fn main() {
     Builder::default()
-        .invoke_handler(generate_handler![open_explorer, start_minecraft_loader])
+        .invoke_handler(generate_handler![open_explorer, start_minecraft_loader, check_launcher_options])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

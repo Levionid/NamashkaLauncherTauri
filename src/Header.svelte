@@ -23,10 +23,10 @@
           <img class="titlebar-image" src={titlebarImage} alt="titlebarImage">
           <div class="titlebar-name" on:click={openGit}>Намашка</div>
         </div>
-        <div class="titlebar-button-minimize" id="titlebar-minimize" on:click={minimizeButton}>-</div>
-        <div class="titlebar-button-close" id="titlebar-close" on:click={closeButton}>
+        <button class="titlebar-button-minimize" id="titlebar-minimize" on:click={minimizeButton}>-</button>
+        <button class="titlebar-button-close" id="titlebar-close" on:click={closeButton}>
           <img src={exitButton} alt="x">
-        </div>
+        </button>
       </div>
 </main>
 
@@ -74,9 +74,11 @@
     }
 
     .titlebar-button-minimize {
+        position: relative;
         width: 40px;
         height: 29px;
-        background-color: #212429;
+        background-color: #00000000;
+        border-style: none;
         transition: 0.3s;
         display: inline-flex;
         justify-content: center;
@@ -84,7 +86,7 @@
         margin-right: 4px;
         color: #fff;
         font-size: 34px;
-        margin-bottom: 6px;
+        bottom: 3px;
         text-shadow: 0 4px 4px var(--shadow-color);
     }
 
@@ -97,6 +99,7 @@
         width: 40px;
         height: 29px;
         background-color: #BD2626;
+        border-style: none;
         border-radius: 10px 0px 0 10px;
         box-shadow: 0 4px 4px var(--shadow-color);
         transition: 0.3s;

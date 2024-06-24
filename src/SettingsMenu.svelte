@@ -24,10 +24,10 @@
             <div>Оперативная память (MB)</div>
             <div class="ram-input">
                 Min
-                <input class="min" type="text" maxlength="70">
+                <input class="min" type="text" maxlength="5">
                 <span>-</span>  
                 Max
-                <input class="max" type="text" maxlength="70">
+                <input class="max" type="text" maxlength="5">
             </div>
         </div>
     </div>
@@ -48,6 +48,20 @@
         display: flex;
         flex-direction: column;
         align-items: start;
+    }
+
+    .token,
+    .token input,
+    .ram,
+    .min,
+    .max,
+    .cancel,
+    .accept {
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-optical-sizing: auto;
+        font-style: normal;
+        font-variation-settings: "slnt" 0;
     }
 
     .token {
