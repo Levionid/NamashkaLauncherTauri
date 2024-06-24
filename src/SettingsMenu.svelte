@@ -1,33 +1,97 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import { invoke } from '@tauri-apps/api/tauri';
+
     export let toggleMainMenu: () => void;
     export let toggleSettingsMenu: () => void;
 
+    let launcherOptions: { [key: string]: string } = {};
+    let token: string = "";
+    let username: string = "";
+    let jvmArguments: string = "";
+    let minJvmArgument: string = "";
+    let maxJvmArgument: string = "";
+
+    function resetForm() {
+        token = launcherOptions['token'] || "";
+        jvmArguments = launcherOptions['jvmArguments'] || "";
+        const jvmArgsArray = jvmArguments.split(" ");
+        minJvmArgument = jvmArgsArray[0] || "";
+        maxJvmArgument = jvmArgsArray[1] || "";
+    }
+
     function handleAccept() {
+        saveLauncherOptions();
         toggleMainMenu();
         toggleSettingsMenu();
     }
 
     function handleCancel() {
+        resetForm();
         toggleMainMenu();
         toggleSettingsMenu();
     }
+
+    async function checkLauncherOptions() {
+        try {
+            launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
+            console.log("Launcher options:", launcherOptions);
+
+            if (launcherOptions) {
+                token = launcherOptions['token'] || "";
+                username = launcherOptions['username'] || "";
+                jvmArguments = launcherOptions['jvmArguments'] || "";
+
+                // Split jvmArguments into minJvmArgument and maxJvmArgument
+                const jvmArgsArray = jvmArguments.split(" ");
+                minJvmArgument = jvmArgsArray[0] || "";
+                maxJvmArgument = jvmArgsArray[1] || "";
+
+                console.log("Token:", token);
+                console.log("Username:", username);
+                console.log("JVM Arguments:", jvmArguments);
+                console.log("Min JVM Argument:", minJvmArgument);
+                console.log("Max JVM Argument:", maxJvmArgument);
+            }
+        } catch (error) {
+            console.error('Failed to check or read launcher options:', error);
+        }
+    }
+
+    async function saveLauncherOptions() {
+        try {
+            await invoke('save_launcher_options', { 
+                username: username,
+                token: token, 
+                minJvmArgument: minJvmArgument,
+                maxJvmArgument: maxJvmArgument
+            });
+            console.log('Launcher options saved successfully.');
+        } catch (error) {
+            console.error('Failed to save launcher options:', error);
+        }
+    }
+
+    onMount(() => {
+        checkLauncherOptions();
+    });
 </script>
 
 <main>
     <div class="settings-block">
         <div class="token">
             <div>Токен</div>
-            <input type="text" maxlength="70" placeholder="Введите токен">
+            <input type="text" maxlength="70" placeholder="Введите токен" bind:value={token}>
         </div>
 
         <div class="ram">
             <div>Оперативная память (MB)</div>
             <div class="ram-input">
                 Min
-                <input class="min" type="text" maxlength="5">
+                <input class="min" type="text" maxlength="5" bind:value={minJvmArgument}>
                 <span>-</span>  
                 Max
-                <input class="max" type="text" maxlength="5">
+                <input class="max" type="text" maxlength="5" bind:value={maxJvmArgument}>
             </div>
         </div>
     </div>

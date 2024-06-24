@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { onMount, createEventDispatcher } from 'svelte';
+    import { onMount } from 'svelte';
     import { invoke } from '@tauri-apps/api/tauri';
 
     // Import images correctly
     import namashkaCraftTabImage from '../src-tauri/assets/namashkaCraftTabImage.png';
-    import exitButton from '../src-tauri/assets/exitButton.svg';
 
     export let toggleMainMenu: () => void;
     export let toggleSettingsMenu: () => void;
@@ -12,7 +11,12 @@
     let launcherOptionsExists: boolean = false;
     let showTokenInput: boolean = false;
 
-    const dispatch = createEventDispatcher();
+    let launcherOptions: { [key: string]: string } = {};
+    let token: string = "";
+    let username: string = "";
+    let jvmArguments: string = "";
+    let minJvmArgument: string = "";
+    let maxJvmArgument: string = "";
 
     async function openExplorer() {
         try {
@@ -23,24 +27,43 @@
         }
     }
 
-    async function startMinecraftLoader() {
-        const nicknameInput = document.querySelector('.namashka-craft-nickname-input-box') as HTMLInputElement;
-        const errorFeedback = document.querySelector('.error-feedback') as HTMLElement;
+    async function checkTokenInput() {
+        const usernameInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
+        const errorFeedback = document.querySelector('.namashka-craft-token-error-feedback') as HTMLElement;
 
-        if (nicknameInput && errorFeedback) {
+        if (usernameInput && errorFeedback) {
             errorFeedback.textContent = '';
 
-            if (nicknameInput.value.trim() === '') {
+            if (usernameInput.value.trim() === '') {
+                errorFeedback.textContent = 'Введите токен!';
+                return;
+            }
+
+            toggleTokenInput();
+        }
+    }
+
+    async function startMinecraftLoader() {
+        const usernameInput = document.querySelector('.namashka-craft-username-input-box') as HTMLInputElement;
+        const errorFeedback = document.querySelector('.error-feedback') as HTMLElement;
+
+        if (usernameInput && errorFeedback) {
+            errorFeedback.textContent = '';
+
+            if (usernameInput.value.trim() === '') {
                 errorFeedback.textContent = 'Введите ник!';
                 return;
             }
 
             try {
+                saveUsername();
                 await invoke('start_minecraft_loader');
                 console.log('Minecraft Loader started');
             } catch (e) {
-                errorFeedback.textContent = e.toString(); // Display Rust error message
-                console.error('Failed to start Minecraft Loader', e);
+                if (e)  {
+                    errorFeedback.textContent = e.toString(); // Display Rust error message
+                    console.error('Failed to start Minecraft Loader', e);
+                }
             }
         }
     }
@@ -48,6 +71,18 @@
     async function checkLauncherOptions() {
         try {
             launcherOptionsExists = await invoke('check_launcher_options');
+            launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
+            console.log("Launcher options:", launcherOptions);
+
+            if (launcherOptions) {
+                token = launcherOptions['token'] || "";
+                username = launcherOptions['username'] || "";
+                jvmArguments = launcherOptions['jvmArguments'] || "";
+
+                const jvmArgsArray = jvmArguments.split(" ");
+                minJvmArgument = jvmArgsArray[0] || "";
+                maxJvmArgument = jvmArgsArray[1] || "";
+            }
         } catch (e) {
             console.error('Failed to check launcher options', e);
         }
@@ -57,6 +92,68 @@
         showTokenInput = !showTokenInput;
     }
 
+    async function saveLauncherOptions() {
+        const min_jvm_argument = "-Xms0M";
+        const max_jvm_argument = "-Xmx3000M";
+        const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
+        const tokenInputString = tokenInput.value.trim();
+        console.log("Token:", tokenInputString);
+
+        try {
+            await invoke('save_launcher_options', {
+                username: "",
+                token: tokenInputString,
+                minJvmArgument: min_jvm_argument,
+                maxJvmArgument: max_jvm_argument 
+            });
+            
+            console.log('Launcher options saved successfully.');
+        } catch (error) {
+            console.error('Failed to save launcher options:', error);
+        }
+    }
+
+    async function saveUsername() {
+        try {
+            launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
+            console.log("Launcher options:", launcherOptions);
+
+            if (launcherOptions) {
+                token = launcherOptions['token'] || "";
+                const usernameHTMLInputElement = document.querySelector('.namashka-craft-username-input-box') as HTMLInputElement;
+                const username = usernameHTMLInputElement.value;
+                jvmArguments = launcherOptions['jvmArguments'] || "";
+
+                // Split jvmArguments into minJvmArgument and maxJvmArgument
+                const jvmArgsArray = jvmArguments.split(" ");
+                minJvmArgument = jvmArgsArray[0] || "";
+                maxJvmArgument = jvmArgsArray[1] || "";
+
+                console.log("Token:", token);
+                console.log("Username:", username);
+                console.log("JVM Arguments:", jvmArguments);
+                console.log("Min JVM Argument:", minJvmArgument);
+                console.log("Max JVM Argument:", maxJvmArgument);
+
+                try {
+                    await invoke('save_launcher_options', {
+                        username: username,
+                        token: token,
+                        minJvmArgument: minJvmArgument,
+                        maxJvmArgument: maxJvmArgument 
+                    });
+                    
+                    console.log('Launcher options saved successfully.');
+                } catch (error) {
+                    console.error('Failed to save launcher options:', error);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to check or read launcher options:', error);
+        }
+        
+    }
+
     onMount(() => {
         checkLauncherOptions();
     });
@@ -64,7 +161,7 @@
 
 <main>
     <div class="main-content">
-        {#if 1}
+        {#if !launcherOptionsExists}
             <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
         {/if}
     </div>
@@ -78,15 +175,15 @@
                         </svg>
                     </button>
                 </div>
-                <div class="namashka-craft-token-main" on:click={event => event.stopPropagation()}>
+                <div class="namashka-craft-token-main">
                     <div class="token-input-box">
                         <div class="namashka-craft-token-name">Токен</div>
                         <div class="namashka-craft-token-input-box">
                             <div class="namashka-craft-token-text">Токен</div>
                             <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder="Введите токен">
                         </div>
-                        <button class="namashka-craft-save-button">Сохранить</button>
-                        <div class="error-feedback"></div>
+                        <button class="namashka-craft-save-button" on:click={saveLauncherOptions} on:click={checkTokenInput} on:click={checkLauncherOptions}>Сохранить</button>
+                        <div class="namashka-craft-token-error-feedback"></div>
                     </div>
                 </div>
             </div>
@@ -102,20 +199,26 @@
                 сборка <span class="green-text">оптимизирована</span>
             </span>
         </div>
-        <div class="namashka-craft-nickname">
-            <span class="namashka-craft-nickname-text">Ник</span>
-            <input class="namashka-craft-nickname-input-box" type="text" maxlength="15" placeholder="Введите ник">
+        <div class="namashka-craft-username">
+            <span class="namashka-craft-username-text">Ник</span>
+            <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} disabled={!launcherOptionsExists}>
         </div>
-        <button class="namashka-craft-play-button" on:click={startMinecraftLoader}>Играть</button>
+        <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} disabled={!launcherOptionsExists}>Играть</button>
         <div class="error-feedback"></div>
         <div class="buttons">
-            <svg on:click={openExplorer} class="folder-button" id="folder-button" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8.41665 0.166687H2.16665C1.02081 0.166687 0.0937296 1.10419 0.0937296 2.25002L0.083313 14.75C0.083313 15.8959 1.02081 16.8334 2.16665 16.8334H18.8333C19.9791 16.8334 20.9166 15.8959 20.9166 14.75V4.33335C20.9166 3.18752 19.9791 2.25002 18.8333 2.25002H10.5L8.41665 0.166687Z"/>
-            </svg>
-            <svg on:click={toggleMainMenu} on:click={toggleSettingsMenu} class="settings-button" id="settings-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
-                <path id="icon_path" d="M17.9375 11.4792C17.9792 11.1667 18 10.8438 18 10.5C18 10.1667 17.9792 9.83333 17.9271 9.52083L20.0417 7.875C20.2292 7.72917 20.2813 7.44792 20.1667 7.23958L18.1667 3.78125C18.0417 3.55208 17.7813 3.47917 17.5521 3.55208L15.0625 4.55208C14.5417 4.15625 13.9896 3.82292 13.375 3.57292L13 0.927083C12.9584 0.677083 12.75 0.5 12.5 0.5H8.50003C8.25003 0.5 8.05212 0.677083 8.01045 0.927083L7.63545 3.57292C7.02087 3.82292 6.45837 4.16667 5.94795 4.55208L3.45837 3.55208C3.2292 3.46875 2.96878 3.55208 2.84378 3.78125L0.8542 7.23958C0.7292 7.45833 0.770866 7.72917 0.979199 7.875L3.09378 9.52083C3.0417 9.83333 3.00003 10.1771 3.00003 10.5C3.00003 10.8229 3.02087 11.1667 3.07295 11.4792L0.958366 13.125C0.770866 13.2708 0.718783 13.5521 0.833366 13.7604L2.83337 17.2188C2.95837 17.4479 3.21878 17.5208 3.44795 17.4479L5.93753 16.4479C6.45837 16.8437 7.01045 17.1771 7.62503 17.4271L8.00003 20.0729C8.05212 20.3229 8.25003 20.5 8.50003 20.5H12.5C12.75 20.5 12.9584 20.3229 12.9896 20.0729L13.3646 17.4271C13.9792 17.1771 14.5417 16.8437 15.0521 16.4479L17.5417 17.4479C17.7709 17.5312 18.0313 17.4479 18.1563 17.2188L20.1563 13.7604C20.2813 13.5312 20.2292 13.2708 20.0313 13.125L17.9375 11.4792ZM10.5 14.25C8.43753 14.25 6.75003 12.5625 6.75003 10.5C6.75003 8.4375 8.43753 6.75 10.5 6.75C12.5625 6.75 14.25 8.4375 14.25 10.5C14.25 12.5625 12.5625 14.25 10.5 14.25Z"/>
-            </svg>
+            <button on:click={openExplorer} disabled={!launcherOptionsExists} class="button-container">
+                <svg class="folder-button" id="folder-button" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.41665 0.166687H2.16665C1.02081 0.166687 0.0937296 1.10419 0.0937296 2.25002L0.083313 14.75C0.083313 15.8959 1.02081 16.8334 2.16665 16.8334H18.8333C19.9791 16.8334 20.9166 15.8959 20.9166 14.75V4.33335C20.9166 3.18752 19.9791 2.25002 18.8333 2.25002H10.5L8.41665 0.166687Z"/>
+                </svg>
+            </button>
+            
+            <button on:click={toggleMainMenu} on:click={toggleSettingsMenu} disabled={!launcherOptionsExists} class="button-container">
+                <svg class="settings-button" id="settings-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
+                    <path id="icon_path" d="M17.9375 11.4792C17.9792 11.1667 18 10.8438 18 10.5C18 10.1667 17.9792 9.83333 17.9271 9.52083L20.0417 7.875C20.2292 7.72917 20.2813 7.44792 20.1667 7.23958L18.1667 3.78125C18.0417 3.55208 17.7813 3.47917 17.5521 3.55208L15.0625 4.55208C14.5417 4.15625 13.9896 3.82292 13.375 3.57292L13 0.927083C12.9584 0.677083 12.75 0.5 12.5 0.5H8.50003C8.25003 0.5 8.05212 0.677083 8.01045 0.927083L7.63545 3.57292C7.02087 3.82292 6.45837 4.16667 5.94795 4.55208L3.45837 3.55208C3.2292 3.46875 2.96878 3.55208 2.84378 3.78125L0.8542 7.23958C0.7292 7.45833 0.770866 7.72917 0.979199 7.875L3.09378 9.52083C3.0417 9.83333 3.00003 10.1771 3.00003 10.5C3.00003 10.8229 3.02087 11.1667 3.07295 11.4792L0.958366 13.125C0.770866 13.2708 0.718783 13.5521 0.833366 13.7604L2.83337 17.2188C2.95837 17.4479 3.21878 17.5208 3.44795 17.4479L5.93753 16.4479C6.45837 16.8437 7.01045 17.1771 7.62503 17.4271L8.00003 20.0729C8.05212 20.3229 8.25003 20.5 8.50003 20.5H12.5C12.75 20.5 12.9584 20.3229 12.9896 20.0729L13.3646 17.4271C13.9792 17.1771 14.5417 16.8437 15.0521 16.4479L17.5417 17.4479C17.7709 17.5312 18.0313 17.4479 18.1563 17.2188L20.1563 13.7604C20.2813 13.5312 20.2292 13.2708 20.0313 13.125L17.9375 11.4792ZM10.5 14.25C8.43753 14.25 6.75003 12.5625 6.75003 10.5C6.75003 8.4375 8.43753 6.75 10.5 6.75C12.5625 6.75 14.25 8.4375 14.25 10.5C14.25 12.5625 12.5625 14.25 10.5 14.25Z"/>
+                </svg>
+            </button>
         </div>
+        
     </aside>
 </main>
 
@@ -136,8 +239,8 @@
     .namashka-craft-authorization-button,
     .namashka-craft-name,
     .namashka-craft-description,
-    .namashka-craft-nickname-text,
-    .namashka-craft-nickname-input-box,
+    .namashka-craft-username-text,
+    .namashka-craft-username-input-box,
     .error-feedback,
     .namashka-craft-token input {
         font-family: "Inter", sans-serif;
@@ -168,6 +271,7 @@
         font-size: 28px;
         text-shadow: 0 4px 4px var(--shadow-color);
         user-select: none;
+        cursor: pointer;
         transition: 0.3s;
     }
 
@@ -222,19 +326,19 @@
         text-shadow: 0 4px 4px var(--shadow-color);
     }
 
-    .namashka-craft-nickname {
+    .namashka-craft-username {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         margin-top: 13.21vh;
     }
 
-    .namashka-craft-nickname-text {
-        color: var(--nickname-text-color);
+    .namashka-craft-username-text {
+        color: var(--username-text-color);
         font-size: 12px;
     }
 
-    .namashka-craft-nickname-input-box {
+    .namashka-craft-username-input-box {
         width: 11.8vw;
         height: 3.52vh;
         background-color: var(--input-background-color);
@@ -256,11 +360,9 @@
         justify-content: center;
         align-items: center;
         transition: 0.3s;
-        cursor: pointer;
         text-shadow: 0 4px 4px var(--shadow-color);
         font-size: 28px;
         color: var(--text-color);
-        cursor: pointer;
         user-select: none;
         font-family: "Inter", sans-serif;
         font-weight: 500;
@@ -268,16 +370,23 @@
         font-style: normal;
         font-variation-settings: "slnt" 0;
     }
-
-    .namashka-craft-play-button:hover {
+    
+    .namashka-craft-play-button:disabled {
+        background-color: #999999;
+    }
+    
+    .namashka-craft-play-button:enabled:hover {
         font-size: 29px;
         background: var(--button-hover-color);
         box-shadow: 0 0 10px var(--button-hover-color);
+        cursor: pointer;
     }
 
-    .error-feedback {
+    .error-feedback,
+    .namashka-craft-token-error-feedback {
         color: red;
         font-size: 12px;
+        font-weight: 500;
         text-align: center;
         margin-top: 5px;
     }
@@ -291,18 +400,23 @@
         right: 0;
     }
 
+    .button-container {
+        background-color: rgba(0, 0, 0, 0);
+        border-style: none;
+        padding: 0;
+    }
+
     .settings-button,
     .folder-button {
         width: 2vw;
         height: 3.7vh;
-        cursor: pointer;
         padding: 2px;
         fill: #6A6B77;
         transition: 0.3s;
     }
-
-    .settings-button:hover,
-    .folder-button:hover {
+    
+    .button-container:enabled:hover svg {
+        cursor: pointer;
         fill: #838490;
     }
 
@@ -310,7 +424,6 @@
         color: var(--green-color);
     }
 
-    /* Стили для затемнения фона и отображения окна */
     .overlay {
         position: fixed;
         top: var(--header-height);
@@ -361,9 +474,7 @@
 
     .token-input-box {
         position: relative;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        top: 20%;
         display: flex;
         flex-direction: column;
         justify-content: center;

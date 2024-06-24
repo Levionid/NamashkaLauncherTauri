@@ -1,0 +1,10 @@
+{
+  "options": {
+    "jvmArguments": [
+      "11111",
+      "11111"
+    ],
+    "username": "lol"
+  },
+  "token": "sdfsdfsdf"
+}

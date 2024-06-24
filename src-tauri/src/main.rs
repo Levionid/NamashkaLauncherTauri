@@ -5,6 +5,63 @@ use std::process::Command;
 use tauri::{generate_handler, Builder};
 use std::fs;
 
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+#[derive(Serialize, Deserialize)]
+struct LauncherOptions {
+    options: Options,
+    token: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Options {
+    jvmArguments: Vec<String>,
+    username: String,
+}
+
+#[tauri::command]
+fn read_launcher_options() -> Result<HashMap<String, String>, String> {
+    let file_path = "./launcherOptions.txt";
+    let contents = fs::read_to_string(file_path)
+        .map_err(|e| format!("Failed to read {}: {}", file_path, e))?;
+
+    let launcher_options: LauncherOptions = serde_json::from_str(&contents)
+        .map_err(|e| format!("Failed to parse {}: {}", file_path, e))?;
+
+    let mut options_map = HashMap::new();
+    options_map.insert("username".to_string(), launcher_options.options.username);
+    options_map.insert("token".to_string(), launcher_options.token);
+
+    // Join the JVM arguments into a single string
+    let jvmArguments = launcher_options.options.jvmArguments.join(" ");
+    options_map.insert("jvmArguments".to_string(), jvmArguments);
+
+    Ok(options_map)
+}
+
+#[tauri::command]
+fn save_launcher_options(username: String, token: String, minJvmArgument: String, maxJvmArgument: String) -> Result<(), String> {
+    let file_path = "./launcherOptions.txt";
+
+    let options = Options {
+        jvmArguments: vec![minJvmArgument, maxJvmArgument],
+        username,
+    };
+
+    let launcher_options = LauncherOptions {
+        options,
+        token,
+    };
+
+    let json_data = serde_json::to_string_pretty(&launcher_options)
+        .map_err(|e| format!("Failed to serialize data: {}", e))?;
+
+    fs::write(file_path, json_data).map_err(|e| format!("Failed to write to file {}: {}", file_path, e))?;
+
+    Ok(())
+}
+
 #[tauri::command]
 fn open_explorer() {
     if cfg!(target_os = "windows") {
@@ -21,7 +78,7 @@ fn start_minecraft_loader() -> Result<(), String> {
     let loader_exists = fs::metadata("minecraftLoader.exe").is_ok();
 
     if loader_exists {
-        Command::new("minecraftLoader.exe")
+        Command::new("./minecraftLoader.exe")
             .spawn()
             .map_err(|e| format!("Failed to start Minecraft Loader: {}", e))?;
         Ok(())
@@ -32,12 +89,16 @@ fn start_minecraft_loader() -> Result<(), String> {
 
 #[tauri::command]
 fn check_launcher_options() -> bool {
-    fs::metadata("launcherOptions.json").is_ok()
+    fs::metadata("./launcherOptions.txt").is_ok()
 }
 
 fn main() {
     Builder::default()
-        .invoke_handler(generate_handler![open_explorer, start_minecraft_loader, check_launcher_options])
+        .invoke_handler(generate_handler![open_explorer,
+             start_minecraft_loader,
+             check_launcher_options,
+             read_launcher_options,
+             save_launcher_options])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
