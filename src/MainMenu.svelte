@@ -36,11 +36,12 @@
 
             if (usernameInput.value.trim() === '') {
                 errorFeedback.textContent = 'Введите токен!';
-                return;
+                return false;
             }
 
-            toggleTokenInput();
         }
+
+        return true;
     }
 
     async function startMinecraftLoader() {
@@ -88,29 +89,40 @@
         }
     }
 
-    function toggleTokenInput() {
+    async function toggleTokenInput() {
         showTokenInput = !showTokenInput;
+        const overlay = document.querySelector('.overlay');
+        if (overlay) {
+            overlay.classList.toggle('active', showTokenInput);
+        }
     }
 
     async function saveLauncherOptions() {
-        const min_jvm_argument = "-Xms0M";
-        const max_jvm_argument = "-Xmx3000M";
+        const min_jvm_argument = "0";
+        const max_jvm_argument = "3000";
         const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
         const tokenInputString = tokenInput.value.trim();
         console.log("Token:", tokenInputString);
+        checkTokenInput();
 
-        try {
-            await invoke('save_launcher_options', {
-                username: "",
-                token: tokenInputString,
-                minJvmArgument: min_jvm_argument,
-                maxJvmArgument: max_jvm_argument 
-            });
-            
-            console.log('Launcher options saved successfully.');
-        } catch (error) {
-            console.error('Failed to save launcher options:', error);
+        if (tokenInputString) {
+            try {
+                await invoke('save_launcher_options', {
+                    username: "",
+                    token: tokenInputString,
+                    minJvmArgument: min_jvm_argument,
+                    maxJvmArgument: max_jvm_argument 
+                });
+                
+                console.log('Launcher options saved successfully.');
+
+                checkLauncherOptions();
+                toggleTokenInput();
+            } catch (error) {
+                console.error('Failed to save launcher options:', error);
+            }
         }
+
     }
 
     async function saveUsername() {
@@ -165,30 +177,28 @@
             <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
         {/if}
     </div>
-    {#if showTokenInput}
-        <div class="overlay">
-            <div class="namashka-craft-token">
-                <div class="namashka-craft-token-header">
-                    <button class="close-button" on:click={toggleTokenInput}>
-                        <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M23.75 7.5125L21.9875 5.75L15 12.7375L8.0125 5.75L6.25 7.5125L13.2375 14.5L6.25 21.4875L8.0125 23.25L15 16.2625L21.9875 23.25L23.75 21.4875L16.7625 14.5L23.75 7.5125Z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="namashka-craft-token-main">
-                    <div class="token-input-box">
-                        <div class="namashka-craft-token-name">Токен</div>
-                        <div class="namashka-craft-token-input-box">
-                            <div class="namashka-craft-token-text">Токен</div>
-                            <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder="Введите токен">
-                        </div>
-                        <button class="namashka-craft-save-button" on:click={saveLauncherOptions} on:click={checkTokenInput} on:click={checkLauncherOptions}>Сохранить</button>
-                        <div class="namashka-craft-token-error-feedback"></div>
+    <div class="overlay {showTokenInput ? 'active' : ''}">
+        <div class="namashka-craft-token">
+            <div class="namashka-craft-token-header">
+                <button class="close-button" on:click={toggleTokenInput}>
+                    <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.75 7.5125L21.9875 5.75L15 12.7375L8.0125 5.75L6.25 7.5125L13.2375 14.5L6.25 21.4875L8.0125 23.25L15 16.2625L21.9875 23.25L23.75 21.4875L16.7625 14.5L23.75 7.5125Z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="namashka-craft-token-main">
+                <div class="token-input-box">
+                    <div class="namashka-craft-token-name">Токен</div>
+                    <div class="namashka-craft-token-input-box">
+                        <div class="namashka-craft-token-text">Токен</div>
+                        <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder="Введите токен">
                     </div>
+                    <button class="namashka-craft-save-button" on:click={saveLauncherOptions}>Сохранить</button>
+                    <div class="namashka-craft-token-error-feedback"></div>
                 </div>
             </div>
         </div>
-    {/if}
+    </div>
     <aside class="namashka-craft-tab">
         <div class="namashka-craft">
             <img class="namashka-craft-tab-image" src={namashkaCraftTabImage} alt="NamashkaCraftTabImage">
@@ -434,13 +444,24 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        backdrop-filter: blur(5px);
-        z-index: 999; /* Поверх всех остальных элементов */
-        transition: 0.3s;
+        backdrop-filter: blur(0);
+        background-color: rgba(0, 0, 0, 0);
+        z-index: 999;
+        opacity: 0; /* Initially transparent */
+        visibility: hidden; /* Initially hidden */
+        transition: opacity 0.3s, background-color 0.3s; /* Smooth transitions */
+    }
+
+    .overlay.active {
+        opacity: 1; /* Fully visible */
+        visibility: visible; /* Make visible */
+        backdrop-filter: blur(5px); /* Apply blur effect */
+        background-color: rgba(0, 0, 0, 0.6); /* Darken the background */
     }
 
     .namashka-craft-token {
         box-shadow: 0 0 10px var(--shadow-color);
+        border-radius: 10px;
     }
 
     .namashka-craft-token-main {

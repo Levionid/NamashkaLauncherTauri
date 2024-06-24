@@ -34,7 +34,9 @@ fn read_launcher_options() -> Result<HashMap<String, String>, String> {
     options_map.insert("token".to_string(), launcher_options.token);
 
     // Join the JVM arguments into a single string
-    let jvmArguments = launcher_options.options.jvmArguments.join(" ");
+    let jvmArguments = format!("{} {}", 
+                                       &launcher_options.options.jvmArguments[0][4..launcher_options.options.jvmArguments[0].len()-1],
+                                       &launcher_options.options.jvmArguments[1][4..launcher_options.options.jvmArguments[1].len()-1]);
     options_map.insert("jvmArguments".to_string(), jvmArguments);
 
     Ok(options_map)
@@ -45,7 +47,7 @@ fn save_launcher_options(username: String, token: String, minJvmArgument: String
     let file_path = "./launcherOptions.txt";
 
     let options = Options {
-        jvmArguments: vec![minJvmArgument, maxJvmArgument],
+        jvmArguments: vec![format!("-Xms{}M", minJvmArgument), format!("-Xmx{}M", maxJvmArgument)],
         username,
     };
 
