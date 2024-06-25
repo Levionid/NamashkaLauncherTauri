@@ -2,8 +2,11 @@
     import { onMount } from 'svelte';
     import { invoke } from '@tauri-apps/api/tauri';
 
-    // Import images correctly
-    import namashkaCraftTabImage from '../src-tauri/assets/namashkaCraftTabImage.png';
+    import TokenInputMenu from './TokenInputMenu.svelte';
+
+    import namashkaCraftImage1201 from '../src-tauri/assets/namashkaCraftImage1201.png';
+    import namashkaCraftImageLite121 from '../src-tauri/assets/namashkaCraftImageLite121.png';
+    import namashkaCraftImageMix121 from '../src-tauri/assets/namashkaCraftImageMix121.png';
 
     export let toggleMainMenu: () => void;
     export let toggleSettingsMenu: () => void;
@@ -18,6 +21,11 @@
     let minJvmArgument: string = "";
     let maxJvmArgument: string = "";
 
+    let selectedImage = namashkaCraftImage1201;
+    let selectedName = "NamashkaCraft";
+    let selectedDescription = "Fabric 1.20.1";
+    let selectedElement = null;
+
     async function openExplorer() {
         try {
             await invoke('open_explorer');
@@ -25,23 +33,6 @@
         } catch (e) {
             console.error('Failed to open explorer', e);
         }
-    }
-
-    async function checkTokenInput() {
-        const usernameInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
-        const errorFeedback = document.querySelector('.namashka-craft-token-error-feedback') as HTMLElement;
-
-        if (usernameInput && errorFeedback) {
-            errorFeedback.textContent = '';
-
-            if (usernameInput.value.trim() === '') {
-                errorFeedback.textContent = 'Введите токен!';
-                return false;
-            }
-
-        }
-
-        return true;
     }
 
     async function startMinecraftLoader() {
@@ -97,34 +88,6 @@
         }
     }
 
-    async function saveLauncherOptions() {
-        const min_jvm_argument = "0";
-        const max_jvm_argument = "3000";
-        const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
-        const tokenInputString = tokenInput.value.trim();
-        console.log("Token:", tokenInputString);
-        checkTokenInput();
-
-        if (tokenInputString) {
-            try {
-                await invoke('save_launcher_options', {
-                    username: "",
-                    token: tokenInputString,
-                    minJvmArgument: min_jvm_argument,
-                    maxJvmArgument: max_jvm_argument 
-                });
-                
-                console.log('Launcher options saved successfully.');
-
-                checkLauncherOptions();
-                toggleTokenInput();
-            } catch (error) {
-                console.error('Failed to save launcher options:', error);
-            }
-        }
-
-    }
-
     async function saveUsername() {
         try {
             launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
@@ -166,54 +129,91 @@
         
     }
 
+    async function selectItem(image, name, description, event) {
+        // Assign values to selected variables
+        selectedImage = image;
+        selectedName = name;
+        selectedDescription = description;
+
+        // Remove styles from previously selected element
+        if (selectedElement) {
+            selectedElement.querySelector('.namashka-craft-name').style.color = '';
+            selectedElement.querySelector('img').style.boxShadow = '';
+        }
+
+        // Get the current target element
+        const target = event.currentTarget;
+
+        // Set styles for the newly selected element
+        target.querySelector('.namashka-craft-name').style.color = 'var(--green-text)';
+        target.querySelector('img').style.boxShadow = '0 4px 10px var(--green-text)';
+
+        // Update the selectedElement variable
+        selectedElement = target;
+    }
+
+    // Use this function to set the initial selected element
+    async function setInitialSelectedElement() {
+        const initialElement = document.querySelector(".main-img-content.initial-selected");
+        if (initialElement) {
+            selectItem(
+                namashkaCraftImage1201,
+                "NamashkaCraft",
+                "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.20.1</span><br>содержит в себе <span style=\"color: var(--green-text)\">>100 модов</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>",
+                { currentTarget: initialElement }
+            );
+        }
+    }
+
     onMount(() => {
-        checkLauncherOptions();
+        checkLauncherOptions().then(() => {
+            setInitialSelectedElement();
+        });
     });
 </script>
 
 <main>
     <div class="main-content">
         {#if !launcherOptionsExists}
-            <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
+            <div class="authorization-button-container">
+                <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
+            </div>
+        {:else}
+            <div class="main-img-content initial-selected" on:click={(event) => selectItem(namashkaCraftImage1201, "NamashkaCraft", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.20.1</span><br>содержит в себе <span style=\"color: var(--green-text)\">>100 модов</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
+                <img src={namashkaCraftImage1201} alt="namashkaCraftImage1201">
+                <div class="namashka-craft-name">NamashkaCraft</div>
+                <div class="namashka-craft-description">Fabric 1.20.1</div>
+            </div>
+            <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageMix121, "Namashka Mix", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка содержит <span style=\"color: var(--green-text)\">удобные моды</span><br>для <span style=\"color: var(--green-text)\">улучшения геймлея</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
+                <img src={namashkaCraftImageMix121} alt="namashkaCraftImageMix121">
+                <div class="namashka-craft-name">Namashka Mix</div>
+                <div class="namashka-craft-description">Fabric 1.21</div>
+            </div>
+            <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageLite121, "Namashka Lite", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
+                <img src={namashkaCraftImageLite121} alt="namashkaCraftImageLite121">
+                <div class="namashka-craft-name">Namashka Lite</div>
+                <div class="namashka-craft-description">Fabric 1.21</div>
+            </div>
         {/if}
     </div>
     <div class="overlay {showTokenInput ? 'active' : ''}">
-        <div class="namashka-craft-token">
-            <div class="namashka-craft-token-header">
-                <button class="close-button" on:click={toggleTokenInput}>
-                    <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M23.75 7.5125L21.9875 5.75L15 12.7375L8.0125 5.75L6.25 7.5125L13.2375 14.5L6.25 21.4875L8.0125 23.25L15 16.2625L21.9875 23.25L23.75 21.4875L16.7625 14.5L23.75 7.5125Z"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="namashka-craft-token-main">
-                <div class="token-input-box">
-                    <div class="namashka-craft-token-name">Токен</div>
-                    <div class="namashka-craft-token-input-box">
-                        <div class="namashka-craft-token-text">Токен</div>
-                        <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder="Введите токен">
-                    </div>
-                    <button class="namashka-craft-save-button" on:click={saveLauncherOptions}>Сохранить</button>
-                    <div class="namashka-craft-token-error-feedback"></div>
-                </div>
-            </div>
-        </div>
+        <TokenInputMenu {toggleTokenInput} {checkLauncherOptions} />
     </div>
     <aside class="namashka-craft-tab">
         <div class="namashka-craft">
-            <img class="namashka-craft-tab-image" src={namashkaCraftTabImage} alt="NamashkaCraftTabImage">
-            <span class="namashka-craft-name">NamashkaCraft</span>
+            <img class="namashka-craft-tab-image" src={selectedImage} alt="Selected Image">
+            <span class="namashka-craft-name">{selectedName}</span>
             <span class="namashka-craft-description">
-                сборка на версии <span class="green-text">Fabric 1.20.1</span><br>
-                содержит в себе <span class="green-text">>100 модов</span><br>
-                сборка <span class="green-text">оптимизирована</span>
+                {@html selectedDescription}
             </span>
         </div>
-        <div class="namashka-craft-username">
-            <span class="namashka-craft-username-text">Ник</span>
-            <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} disabled={!launcherOptionsExists}>
+        <div class="namashka-craft-user-box">
+            <div class="namashka-craft-username">
+                <span class="namashka-craft-username-text">Ник</span>
+                <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} enabled={launcherOptionsExists}>
+            </div>
+            <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} enabled={launcherOptionsExists}>Играть</button>
         </div>
-        <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} disabled={!launcherOptionsExists}>Играть</button>
         <div class="error-feedback"></div>
         <div class="buttons">
             <button on:click={openExplorer} disabled={!launcherOptionsExists} class="button-container">
@@ -228,11 +228,14 @@
                 </svg>
             </button>
         </div>
-        
     </aside>
 </main>
 
 <style>
+    :root {
+        --green-text: #3ECD5E;
+    }
+
     main {
         display: flex;
         margin: 0;
@@ -251,8 +254,7 @@
     .namashka-craft-description,
     .namashka-craft-username-text,
     .namashka-craft-username-input-box,
-    .error-feedback,
-    .namashka-craft-token input {
+    .error-feedback {
         font-family: "Inter", sans-serif;
         font-weight: 600;
         font-optical-sizing: auto;
@@ -265,12 +267,45 @@
         top: var(--header-height);
         width: calc(100vw - 30.21vw);
         height: calc(100vh - var(--header-height));
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .main-content img {
+        width: 250px;
+        height: 140px;
+        margin: 0 auto;
+        border-radius: 15px;
+        box-shadow: 0 4px 4px var(--shadow-color);
+        transition: 0.3s;
+    }
+
+    .main-content img:hover {
+        width: calc(250px * 1.1);
+        height: calc(140px * 1.1);
+    }
+    
+    .main-img-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        user-select: none;
+    }
+
+    .authorization-button-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
     }
 
     .namashka-craft-authorization-button {
         position: relative;
-        width: 26.88vw;
-        height: 9.81vh;
+        width: 228px;
+        height: 140px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -282,7 +317,7 @@
         text-shadow: 0 4px 4px var(--shadow-color);
         user-select: none;
         cursor: pointer;
-        transition: 0.3s;
+        transition: color 0.3s, box-shadow 0.3s, font-size 0.3s;
     }
 
     .namashka-craft-authorization-button:hover {
@@ -328,6 +363,7 @@
         margin-bottom: 1vh;
         width: 22.08vw;
         height: 5.37vh;
+        transition: color 0.3s;
     }
 
     .namashka-craft-description {
@@ -336,7 +372,13 @@
         text-shadow: 0 4px 4px var(--shadow-color);
     }
 
+    .namashka-craft-user-box {
+        position: absolute;
+        bottom: 15.93vh;
+    }
+
     .namashka-craft-username {
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -369,7 +411,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: 0.3s;
+        transition: color 0.3s, box-shadow 0.3s, font-size 0.3s;
         text-shadow: 0 4px 4px var(--shadow-color);
         font-size: 28px;
         color: var(--text-color);
@@ -392,8 +434,7 @@
         cursor: pointer;
     }
 
-    .error-feedback,
-    .namashka-craft-token-error-feedback {
+    .error-feedback {
         color: red;
         font-size: 12px;
         font-weight: 500;
@@ -422,7 +463,7 @@
         height: 3.7vh;
         padding: 2px;
         fill: #6A6B77;
-        transition: 0.3s;
+        transition: fill 0.3s;
     }
     
     .button-container:enabled:hover svg {
@@ -447,119 +488,15 @@
         backdrop-filter: blur(0);
         background-color: rgba(0, 0, 0, 0);
         z-index: 999;
-        opacity: 0; /* Initially transparent */
-        visibility: hidden; /* Initially hidden */
-        transition: opacity 0.3s, background-color 0.3s; /* Smooth transitions */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, background-color 0.3s;
     }
 
     .overlay.active {
-        opacity: 1; /* Fully visible */
-        visibility: visible; /* Make visible */
-        backdrop-filter: blur(5px); /* Apply blur effect */
-        background-color: rgba(0, 0, 0, 0.6); /* Darken the background */
-    }
-
-    .namashka-craft-token {
-        box-shadow: 0 0 10px var(--shadow-color);
-        border-radius: 10px;
-    }
-
-    .namashka-craft-token-main {
-        background-color: #2A2F32;
-        border-radius: 0 0 10px 10px;
-        width: 58.33vw;
-        height: calc(64.81vh - 40px);
-        text-align: center;
-    }
-
-    .namashka-craft-token-header {
-        position: relative;
-        width: 58.33vw;
-        height: 40px;
-        background-color: #212429;
-        border-radius: 10px 10px 0 0;
-    }
-
-    .close-button {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background-color: rgba(0, 0, 0, 0);
-        cursor: pointer;
-        border-style: none;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        fill: white;
-    }
-
-    .token-input-box {
-        position: relative;
-        top: 20%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .namashka-craft-token-name {
-        position: relative;
-        color: #fff;
-        margin-bottom: 23px;
-        font-size: 40px;
-        text-shadow: 0 4px 10px var(--shadow-color);
-    }
-
-    .namashka-craft-token-input-box {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-    }
-
-    .namashka-craft-token-input-box div {
-        color: #9A9A9A;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .namashka-craft-token-input-box input {
-        width: 23.44vw;
-        height: 4.44vh;
-        color: #fff;
-        background-color: #222628;
-        border: none;
-        border-radius: 6px;
-        margin-bottom: 5.19vh;
-    }
-
-    .namashka-craft-save-button {
-        width: 23.44vw;
-        height: 4.44vh;
-        background-color: #4390D8;
-        border-radius: 6px;
-        border: none;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: 0.3s;
-        cursor: pointer;
-        text-shadow: 0 4px 4px var(--shadow-color);
-        font-size: 14px;
-        color: var(--text-color);
-        cursor: pointer;
-        user-select: none;
-        font-family: "Inter", sans-serif;
-        font-weight: 500;
-        font-optical-sizing: auto;
-        font-style: normal;
-        font-variation-settings: "slnt" 0;
-    }
-
-    .namashka-craft-save-button:hover {
-        font-size: 15px;
-        background: #6BA8E0;
-        box-shadow: 0 0 10px #6BA8E0;
+        opacity: 1;
+        visibility: visible;
+        backdrop-filter: blur(5px);
+        background-color: rgba(0, 0, 0, 0.25);
     }
 </style>

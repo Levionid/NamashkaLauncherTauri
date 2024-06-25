@@ -223,7 +223,7 @@
         border-width: 2px;
         border-color: #4390D8;
         margin-right: 1.67vw;
-        transition: 0.3s;
+        transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;
     }
 
     .cancel:hover {
@@ -243,7 +243,7 @@
         text-shadow: 0 4px 4px var(--shadow-color);
         border: none;
         border-radius: 10px;
-        transition: 0.3s;
+        transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;
     }
 
     .accept:hover {

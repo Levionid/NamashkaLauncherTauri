@@ -1,7 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::thread;
+use tauri::{Manager, Window};
 use tauri::{generate_handler, Builder};
 use std::fs;
 
@@ -75,14 +77,35 @@ fn open_explorer() {
 }
 
 #[tauri::command]
-fn start_minecraft_loader() -> Result<(), String> {
+fn start_minecraft_loader(window: Window) -> Result<(), String> {
     // Check if minecraftLoader.exe exists
-    let loader_exists = fs::metadata("minecraftLoader.exe").is_ok();
+    let loader_exists = std::fs::metadata("minecraftLoader.exe").is_ok();
 
     if loader_exists {
-        Command::new("./minecraftLoader.exe")
+        // Hide the launcher window
+        window.hide().map_err(|e| format!("Failed to hide window: {}", e))?;
+
+        // Start the minecraftLoader.exe process
+        let mut child = Command::new("./minecraftLoader.exe")
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
             .spawn()
             .map_err(|e| format!("Failed to start Minecraft Loader: {}", e))?;
+
+        // Monitor the process in a new thread
+        let app_handle = window.app_handle();
+        thread::spawn(move || {
+            let result = child.wait();
+            if result.is_ok() {
+                // Show the launcher window again after the process has finished
+                app_handle
+                    .get_window("main")
+                    .unwrap()
+                    .show()
+                    .expect("Failed to show window");
+            }
+        });
+
         Ok(())
     } else {
         Err("minecraft loader отсутствует".to_string())
