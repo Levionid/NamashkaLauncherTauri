@@ -3,6 +3,7 @@
 
     export let toggleTokenInput: () => void;
     export let checkLauncherOptions: () => void;
+    export let setInitialSelectedElement: () => void;
 
     async function saveLauncherOptions() {
         const min_jvm_argument = "0";
@@ -25,6 +26,7 @@
 
                 checkLauncherOptions();
                 toggleTokenInput();
+                setInitialSelectedElement();
             } catch (error) {
                 console.error('Failed to save launcher options:', error);
             }
@@ -42,7 +44,6 @@
                 errorFeedback.textContent = 'Введите токен!';
                 return false;
             }
-
         }
 
         return true;

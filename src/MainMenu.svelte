@@ -21,10 +21,10 @@
     let minJvmArgument: string = "";
     let maxJvmArgument: string = "";
 
-    let selectedImage = namashkaCraftImage1201;
-    let selectedName = "NamashkaCraft";
-    let selectedDescription = "Fabric 1.20.1";
-    let selectedElement = null;
+    let selectedImage: string = namashkaCraftImage1201;
+    let selectedName: string = "NamashkaCraft";
+    let selectedDescription: string = "Fabric 1.20.1";
+    let selectedElement: null = null;
 
     async function openExplorer() {
         try {
@@ -129,7 +129,7 @@
         
     }
 
-    async function selectItem(image, name, description, event) {
+    async function selectItem(image: string, name: string, description: string, event) {
         // Assign values to selected variables
         selectedImage = image;
         selectedName = name;
@@ -174,17 +174,16 @@
 
 <main>
     <div class="main-content">
-        {#if !launcherOptionsExists}
-            <div class="authorization-button-container">
-                <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
-            </div>
-        {:else}
+        <div class="authorization-button-container {!launcherOptionsExists ? 'active' : ''}">
+            <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
+        </div>
+        <div class="main-img-content-container {launcherOptionsExists ? 'active' : ''}">
             <div class="main-img-content initial-selected" on:click={(event) => selectItem(namashkaCraftImage1201, "NamashkaCraft", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.20.1</span><br>содержит в себе <span style=\"color: var(--green-text)\">>100 модов</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
                 <img src={namashkaCraftImage1201} alt="namashkaCraftImage1201">
                 <div class="namashka-craft-name">NamashkaCraft</div>
                 <div class="namashka-craft-description">Fabric 1.20.1</div>
             </div>
-            <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageMix121, "Namashka Mix", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка содержит <span style=\"color: var(--green-text)\">удобные моды</span><br>для <span style=\"color: var(--green-text)\">улучшения геймлея</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
+            <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageMix121, "Namashka Mix", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка содержит <span style=\"color: var(--green-text)\">моды</span><br>для <span style=\"color: var(--green-text)\">улучшения геймлея</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
                 <img src={namashkaCraftImageMix121} alt="namashkaCraftImageMix121">
                 <div class="namashka-craft-name">Namashka Mix</div>
                 <div class="namashka-craft-description">Fabric 1.21</div>
@@ -194,10 +193,10 @@
                 <div class="namashka-craft-name">Namashka Lite</div>
                 <div class="namashka-craft-description">Fabric 1.21</div>
             </div>
-        {/if}
+        </div>
     </div>
     <div class="overlay {showTokenInput ? 'active' : ''}">
-        <TokenInputMenu {toggleTokenInput} {checkLauncherOptions} />
+        <TokenInputMenu {toggleTokenInput} {checkLauncherOptions} {setInitialSelectedElement} />
     </div>
     <aside class="namashka-craft-tab">
         <div class="namashka-craft">
@@ -210,11 +209,11 @@
         <div class="namashka-craft-user-box">
             <div class="namashka-craft-username">
                 <span class="namashka-craft-username-text">Ник</span>
-                <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} enabled={launcherOptionsExists}>
+                <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} disabled={!launcherOptionsExists}>
             </div>
-            <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} enabled={launcherOptionsExists}>Играть</button>
+            <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} disabled={!launcherOptionsExists}>Играть</button>
+            <div class="error-feedback"></div>
         </div>
-        <div class="error-feedback"></div>
         <div class="buttons">
             <button on:click={openExplorer} disabled={!launcherOptionsExists} class="button-container">
                 <svg class="folder-button" id="folder-button" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg">
@@ -267,6 +266,12 @@
         top: var(--header-height);
         width: calc(100vw - 30.21vw);
         height: calc(100vh - var(--header-height));
+    }
+
+    .main-img-content-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         padding: 20px;
@@ -300,12 +305,19 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .authorization-button-container.active {
+        opacity: 1;
+        visibility: visible;
     }
 
     .namashka-craft-authorization-button {
         position: relative;
-        width: 228px;
-        height: 140px;
+        width: 258px;
+        height: 53px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -374,7 +386,7 @@
 
     .namashka-craft-user-box {
         position: absolute;
-        bottom: 15.93vh;
+        top: 60vh;
     }
 
     .namashka-craft-username {
@@ -382,7 +394,6 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        margin-top: 13.21vh;
     }
 
     .namashka-craft-username-text {
@@ -471,10 +482,6 @@
         fill: #838490;
     }
 
-    .green-text {
-        color: var(--green-color);
-    }
-
     .overlay {
         position: fixed;
         top: var(--header-height);
@@ -498,5 +505,15 @@
         visibility: visible;
         backdrop-filter: blur(5px);
         background-color: rgba(0, 0, 0, 0.25);
+    }
+
+    .main-img-content-container {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .main-img-content-container.active {
+        opacity: 1;
+        visibility: visible;
     }
 </style>
