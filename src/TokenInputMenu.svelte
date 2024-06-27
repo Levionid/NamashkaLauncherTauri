@@ -6,8 +6,8 @@
     export let setInitialSelectedElement: () => void;
 
     async function saveLauncherOptions() {
-        const min_jvm_argument = "0";
-        const max_jvm_argument = "3000";
+        const minJvmArgument = "0";
+        const maxJvmArgument = "3000";
         const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
         const tokenInputString = tokenInput.value.trim();
         console.log("Token:", tokenInputString);
@@ -18,8 +18,8 @@
                 await invoke('save_launcher_options', {
                     username: "",
                     token: tokenInputString,
-                    minJvmArgument: min_jvm_argument,
-                    maxJvmArgument: max_jvm_argument 
+                    minJvmArgument: minJvmArgument,
+                    maxJvmArgument: maxJvmArgument 
                 });
                 
                 console.log('Launcher options saved successfully.');

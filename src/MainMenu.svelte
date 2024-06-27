@@ -195,7 +195,7 @@
             </div>
         </div>
     </div>
-    <div class="overlay {showTokenInput ? 'active' : ''}">
+    <div class="overlay {showTokenInput ? 'active' : ''} {!showTokenInput ? 'disabled' : ''}">
         <TokenInputMenu {toggleTokenInput} {checkLauncherOptions} {setInitialSelectedElement} />
     </div>
     <aside class="namashka-craft-tab">
