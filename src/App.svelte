@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import Header from '../src/Header.svelte';
   import MainMenu from './MainMenu.svelte';
   import SettingsMenu from './SettingsMenu.svelte';
@@ -62,6 +64,10 @@
   function toggleSettingsMenu() {
     isSettingsOpen = !isSettingsOpen;
   }
+
+  onMount(() => {
+    checkLauncherOptions();
+  });
 </script>
 
 <main>
