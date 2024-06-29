@@ -1,16 +1,15 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { invoke } from '@tauri-apps/api/tauri';
 
     export let toggleMainMenu: () => void;
     export let toggleSettingsMenu: () => void;
 
-    let launcherOptions: { [key: string]: string } = {};
-    let token: string = "";
-    let username: string = "";
-    let jvmArguments: string = "";
-    let minJvmArgument: string = "";
-    let maxJvmArgument: string = "";
+    export let launcherOptions: { [key: string]: string };
+    export let token: string;
+    export let username: string;
+    export let jvmArguments: string;
+    export let minJvmArgument: string;
+    export let maxJvmArgument: string;
 
     function resetForm() {
         token = launcherOptions['token'] || "";
@@ -32,32 +31,6 @@
         toggleSettingsMenu();
     }
 
-    async function checkLauncherOptions() {
-        try {
-            launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
-            console.log("Launcher options:", launcherOptions);
-
-            if (launcherOptions) {
-                token = launcherOptions['token'] || "";
-                username = launcherOptions['username'] || "";
-                jvmArguments = launcherOptions['jvmArguments'] || "";
-
-                // Split jvmArguments into minJvmArgument and maxJvmArgument
-                const jvmArgsArray = jvmArguments.split(" ");
-                minJvmArgument = jvmArgsArray[0] || "";
-                maxJvmArgument = jvmArgsArray[1] || "";
-
-                console.log("Token:", token);
-                console.log("Username:", username);
-                console.log("JVM Arguments:", jvmArguments);
-                console.log("Min JVM Argument:", minJvmArgument);
-                console.log("Max JVM Argument:", maxJvmArgument);
-            }
-        } catch (error) {
-            console.error('Failed to check or read launcher options:', error);
-        }
-    }
-
     async function saveLauncherOptions() {
         try {
             await invoke('save_launcher_options', { 
@@ -71,10 +44,6 @@
             console.error('Failed to save launcher options:', error);
         }
     }
-
-    onMount(() => {
-        checkLauncherOptions();
-    });
 </script>
 
 <main>

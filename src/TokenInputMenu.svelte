@@ -2,29 +2,33 @@
     import { invoke } from '@tauri-apps/api/tauri';
 
     export let toggleTokenInput: () => void;
-    export let checkLauncherOptions: () => void;
+    export let toggleLauncherOptionsExists: () => void;
     export let setInitialSelectedElement: () => void;
 
+    export let token: string;
+    export let minJvmArgument: string;
+    export let maxJvmArgument: string;
+
     async function saveLauncherOptions() {
-        const minJvmArgument = "0";
-        const maxJvmArgument = "3000";
+        minJvmArgument = "0";
+        maxJvmArgument = "3000";
         const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
-        const tokenInputString = tokenInput.value.trim();
-        console.log("Token:", tokenInputString);
+        token = tokenInput.value.trim();
+        console.log("Token:", token);
         checkTokenInput();
 
-        if (tokenInputString) {
+        if (token) {
             try {
                 await invoke('save_launcher_options', {
                     username: "",
-                    token: tokenInputString,
+                    token: token,
                     minJvmArgument: minJvmArgument,
                     maxJvmArgument: maxJvmArgument 
                 });
                 
                 console.log('Launcher options saved successfully.');
 
-                checkLauncherOptions();
+                toggleLauncherOptionsExists();
                 toggleTokenInput();
                 setInitialSelectedElement();
             } catch (error) {
@@ -34,13 +38,13 @@
     }
 
     async function checkTokenInput() {
-        const usernameInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
+        const tokenInput = document.querySelector('.namashka-craft-token-input') as HTMLInputElement;
         const errorFeedback = document.querySelector('.namashka-craft-token-error-feedback') as HTMLElement;
 
-        if (usernameInput && errorFeedback) {
+        if (tokenInput && errorFeedback) {
             errorFeedback.textContent = '';
 
-            if (usernameInput.value.trim() === '') {
+            if (tokenInput.value.trim() === '') {
                 errorFeedback.textContent = 'Введите токен!';
                 return false;
             }

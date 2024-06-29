@@ -85,8 +85,9 @@ fn start_minecraft_loader(window: Window) -> Result<(), String> {
         // Hide the launcher window
         window.hide().map_err(|e| format!("Failed to hide window: {}", e))?;
 
-        // Start the minecraftLoader.exe process
+        // Start the minecraftLoader.exe process in the ./NamashkaCraft directory
         let mut child = Command::new("./minecraftLoader.exe")
+            .current_dir("./NamashkaCraft")
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
