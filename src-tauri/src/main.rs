@@ -77,17 +77,20 @@ fn open_explorer() {
 }
 
 #[tauri::command]
-fn start_minecraft_loader(window: Window) -> Result<(), String> {
+fn start_minecraft_loader(window: Window, mcpack_dir: String) -> Result<(), String> {
     // Check if minecraftLoader.exe exists
     let loader_exists = std::fs::metadata("minecraftLoader.exe").is_ok();
 
     if loader_exists {
+        // Create the mcpack_dir directory if it doesn't exist
+        std::fs::create_dir_all(&mcpack_dir).map_err(|e| format!("Failed to create directory {}: {}", mcpack_dir, e))?;
+
         // Hide the launcher window
         window.hide().map_err(|e| format!("Failed to hide window: {}", e))?;
 
-        // Start the minecraftLoader.exe process in the ./NamashkaCraft directory
+        // Start the minecraftLoader.exe process in the specified mcpack_dir directory
         let mut child = Command::new("./minecraftLoader.exe")
-            .current_dir("./NamashkaCraft")
+            .current_dir(format!("./{}", mcpack_dir))
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()

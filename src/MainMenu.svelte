@@ -54,7 +54,7 @@
 
             try {
                 saveUsername();
-                await invoke('start_minecraft_loader');
+                await invoke('start_minecraft_loader', { mcpackDir: selectedName.trim() }); // Change mcpack_dir to mcpackDir
                 console.log('Minecraft Loader started');
             } catch (e) {
                 if (e)  {
