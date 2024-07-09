@@ -7,6 +7,7 @@
     import namashkaCraftImage1201 from '../src-tauri/assets/namashkaCraftImage1201.png';
     import namashkaCraftImageLite121 from '../src-tauri/assets/namashkaCraftImageLite121.png';
     import namashkaCraftImageMix121 from '../src-tauri/assets/namashkaCraftImageMix121.png';
+    import logoImage from '../src-tauri/assets/namashkaLogo.png';
 
     export let checkLauncherOptions: () => void;
     export let toggleMainMenu: () => void;
@@ -156,6 +157,7 @@
 </script>
 
 <main>
+    <img class="logo" src={logoImage} alt="logo">
     <div class="main-content {!launcherOptionsExists ? 'authorization' : 'mods-menu'}">
         <div class="authorization-button-container {!launcherOptionsExists ? 'active' : ''}">
             <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
@@ -256,6 +258,17 @@
 
     .main-content.mods-menu {
         width: calc(100vw - 30.21vw);
+    }
+
+    .logo {
+        position: fixed;
+        width: 578px;
+        height: 578px;
+        left: -190px;
+        top: 105px;
+
+        opacity: 20%;
+        filter: blur(5px);
     }
 
     .main-img-content-container {
