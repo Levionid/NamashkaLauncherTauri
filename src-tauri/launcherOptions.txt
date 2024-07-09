@@ -4,7 +4,7 @@
       "-Xms0M",
       "-Xmx3000M"
     ],
-    "username": "h"
+    "username": ""
   },
-  "token": "1"
+  "token": "asd"
 }

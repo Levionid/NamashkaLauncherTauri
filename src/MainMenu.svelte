@@ -156,7 +156,7 @@
 </script>
 
 <main>
-    <div class="main-content">
+    <div class="main-content {!launcherOptionsExists ? 'authorization' : 'mods-menu'}">
         <div class="authorization-button-container {!launcherOptionsExists ? 'active' : ''}">
             <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
         </div>
@@ -181,12 +181,12 @@
     <div class="overlay {showTokenInput ? 'active' : ''}">
         <TokenInputMenu {toggleTokenInput} {toggleLauncherOptionsExists} {setInitialSelectedElement}  {token} {minJvmArgument} {maxJvmArgument}/>
     </div>
-    <aside class="namashka-craft-tab">
+    <aside class="namashka-craft-tab {launcherOptionsExists ? 'active' : 'passive'}">
         <div class="namashka-craft">
             <img class="namashka-craft-tab-image" src={selectedImage} alt="Selected Image">
             <span class="namashka-craft-name">{selectedName}</span>
             <span class="namashka-craft-description">
-                {@html selectedDescription}
+                    {@html selectedDescription}
             </span>
         </div>
         <div class="namashka-craft-user-box">
@@ -247,18 +247,32 @@
     .main-content {
         position: absolute;
         top: var(--header-height);
-        width: calc(100vw - 30.21vw);
         height: calc(100vh - var(--header-height));
+    }
+    
+    .main-content.authorization {
+        width: 100vw;
+    }
+
+    .main-content.mods-menu {
+        width: calc(100vw - 30.21vw);
     }
 
     .main-img-content-container {
         position: absolute;
         width: 100%;
         height: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        padding: 20px;
-        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 0;
+        column-gap: 60px;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    .main-img-content-container.active {
+        opacity: 1;
     }
 
     .main-content img {
@@ -323,16 +337,27 @@
 
     .namashka-craft-tab {
         position: absolute;
-        right: 0;
         top: var(--header-height);
         width: 30.21vw;
         height: calc(100vh - var(--header-height));
         background-color: var(--tab-background-color);
-        box-shadow: -4px 0 4px var(--shadow-color);
         display: flex;
         flex-direction: column;
         align-items: center;
         z-index: 0;
+    }
+
+    .namashka-craft-tab.active {
+        right: 0;
+        box-shadow: -4px 0 4px var(--shadow-color);
+        visibility: visible;
+        transition: right 0.7s ease-out, box-shadow 0.7s ease-out;
+    }
+
+    .namashka-craft-tab.passive {
+        right: -30.21vw;
+        box-shadow: none;
+        visibility: hidden;
     }
 
     .namashka-craft {
@@ -355,9 +380,6 @@
         color: var(--text-color);
         font-size: 28px;
         text-shadow: 0 4px 4px var(--shadow-color);
-        margin-bottom: 1vh;
-        width: 22.08vw;
-        height: 5.37vh;
         transition: color 0.3s;
     }
 
@@ -427,7 +449,7 @@
     
     .namashka-craft-play-button:enabled:hover {
         font-size: 29px;
-        background: var(--button-hover-color);
+        background-color: var(--button-hover-color);
         box-shadow: 0 0 10px var(--button-hover-color);
         cursor: pointer;
     }
@@ -479,7 +501,6 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        backdrop-filter: blur(0);
         background-color: rgba(0, 0, 0, 0);
         z-index: 999;
         opacity: 0;
@@ -490,7 +511,6 @@
     .overlay.active {
         opacity: 1;
         visibility: visible;
-        backdrop-filter: blur(5px);
         background-color: rgba(0, 0, 0, 0.25);
     }
 
