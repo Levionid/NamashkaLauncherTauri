@@ -266,9 +266,9 @@
         height: 578px;
         left: -190px;
         top: 105px;
-
         opacity: 20%;
         filter: blur(5px);
+        user-select: none;
     }
 
     .main-img-content-container {
@@ -387,6 +387,7 @@
         box-shadow: 0 4px 4px var(--shadow-color);
         margin-top: 4.1vh;
         margin-bottom: 0.6vh;
+        user-select: none;
     }
 
     .namashka-craft-name {
