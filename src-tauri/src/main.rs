@@ -10,6 +10,9 @@ use std::fs;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
+use window_shadows::set_shadow;
+
 #[derive(Serialize, Deserialize)]
 struct LauncherOptions {
     options: Options,
@@ -123,6 +126,17 @@ fn check_launcher_options() -> bool {
 
 fn main() {
     Builder::default()
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            
+            #[cfg(any(windows, target_os = "macos"))]
+            set_shadow(&window, true).unwrap();
+            
+            #[cfg(target_os = "windows")]
+            apply_blur(&window, Some((42, 47, 50, 200)))
+                .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+            Ok(())
+        })
         .invoke_handler(generate_handler![open_explorer,
              start_minecraft_loader,
              check_launcher_options,

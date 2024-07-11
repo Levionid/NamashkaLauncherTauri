@@ -35,7 +35,6 @@
         width: 100vw;
         height: var(--header-height);
         background-color: var(--header-color);
-        box-shadow: 0 4px 4px var(--shadow-color);
         display: flex;
         justify-content: flex-end;
         position: fixed;

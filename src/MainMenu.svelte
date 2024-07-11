@@ -132,7 +132,7 @@
 
         // Set styles for the newly selected element
         target.querySelector('.namashka-craft-name').style.color = 'var(--green-text)';
-        target.querySelector('img').style.boxShadow = '0 4px 10px var(--green-text)';
+        target.querySelector('img').style.boxShadow = '0 4px 16px var(--green-text)';
 
         // Update the selectedElement variable
         selectedElement = target;
@@ -162,26 +162,26 @@
         <div class="authorization-button-container {!launcherOptionsExists ? 'active' : ''}">
             <button class="namashka-craft-authorization-button" on:click={toggleTokenInput}>Ввести токен</button>
         </div>
-        <div class="main-img-content-container {launcherOptionsExists ? 'active' : ''}">
+        <section class="main-img-content-container {launcherOptionsExists ? 'active' : ''}">
             <div class="main-img-content initial-selected" on:click={(event) => selectItem(namashkaCraftImage1201, "NamashkaCraft", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.20.1</span><br>содержит в себе <span style=\"color: var(--green-text)\">>100 модов</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
                 <img src={namashkaCraftImage1201} alt="namashkaCraftImage1201">
-                <div class="namashka-craft-name">NamashkaCraft</div>
-                <div class="namashka-craft-description">Fabric 1.20.1</div>
+                <label class="namashka-craft-name">NamashkaCraft</label>
+                <label class="namashka-craft-description">Fabric 1.20.1</label>
             </div>
             <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageMix121, "Namashka Mix", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка содержит <span style=\"color: var(--green-text)\">моды</span><br>для <span style=\"color: var(--green-text)\">улучшения геймлея</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
                 <img src={namashkaCraftImageMix121} alt="namashkaCraftImageMix121">
-                <div class="namashka-craft-name">Namashka Mix</div>
-                <div class="namashka-craft-description">Fabric 1.21</div>
+                <label class="namashka-craft-name">Namashka Mix</label>
+                <label class="namashka-craft-description">Fabric 1.21</label>
             </div>
             <div class="main-img-content" on:click={(event) => selectItem(namashkaCraftImageLite121, "Namashka Lite", "сборка на версии <span style=\"color: var(--green-text)\">Fabric 1.21</span><br>сборка <span style=\"color: var(--green-text)\">оптимизирована</span>", event)}>
                 <img src={namashkaCraftImageLite121} alt="namashkaCraftImageLite121">
-                <div class="namashka-craft-name">Namashka Lite</div>
-                <div class="namashka-craft-description">Fabric 1.21</div>
+                <label class="namashka-craft-name">Namashka Lite</label>
+                <label class="namashka-craft-description">Fabric 1.21</label>
             </div>
-        </div>
+        </section>
     </div>
     <div class="overlay {showTokenInput ? 'active' : ''}">
-        <TokenInputMenu {toggleTokenInput} {toggleLauncherOptionsExists} {setInitialSelectedElement}  {token} {minJvmArgument} {maxJvmArgument}/>
+        <TokenInputMenu {toggleTokenInput} {toggleLauncherOptionsExists} {setInitialSelectedElement}  {token} {minJvmArgument} {maxJvmArgument} {showTokenInput}/>
     </div>
     <aside class="namashka-craft-tab {launcherOptionsExists ? 'active' : 'passive'}">
         <div class="namashka-craft">
@@ -275,11 +275,14 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        padding: 55px;
         display: flex;
         flex-wrap: wrap;
-        row-gap: 0;
-        column-gap: 60px;
-        justify-content: center;
+        flex-direction: row;
+        align-items: center;
+        align-items: center;
+        align-content: flex-start;
+        gap: 30px 55px;
         opacity: 0;
         transition: opacity 0.5s ease-out;
     }
@@ -287,7 +290,7 @@
     .main-img-content-container.active {
         opacity: 1;
     }
-
+    
     .main-content img {
         width: 250px;
         height: 140px;
@@ -295,11 +298,6 @@
         border-radius: 15px;
         box-shadow: 0 4px 4px var(--shadow-color);
         transition: 0.3s;
-    }
-
-    .main-content img:hover {
-        width: calc(250px * 1.1);
-        height: calc(140px * 1.1);
     }
     
     .main-img-content {
@@ -309,6 +307,11 @@
         justify-content: center;
         text-align: center;
         user-select: none;
+        transition: transform .3s;
+    }
+    
+    .main-img-content:hover {
+        transform: scale(1.1);
     }
 
     .authorization-button-container {
@@ -362,7 +365,6 @@
 
     .namashka-craft-tab.active {
         right: 0;
-        box-shadow: -4px 0 4px var(--shadow-color);
         visibility: visible;
         transition: right 0.7s ease-out, box-shadow 0.7s ease-out;
     }
@@ -519,7 +521,7 @@
         z-index: 999;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s, background-color 0.3s;
+        transition: visibility 0.3s, opacity 0.3s, background-color 0.3s;
     }
 
     .overlay.active {
@@ -527,6 +529,8 @@
         visibility: visible;
         background-color: rgba(0, 0, 0, 0.25);
     }
+
+    
 
     .main-img-content-container {
         opacity: 0;

@@ -8,6 +8,7 @@
     export let token: string;
     export let minJvmArgument: string;
     export let maxJvmArgument: string;
+    export let showTokenInput: boolean;
 
     async function saveLauncherOptions() {
         minJvmArgument = "0";
@@ -55,7 +56,7 @@
 </script>
 
 <main>
-    <div class="namashka-craft-token">
+    <div class="namashka-craft-token {showTokenInput ? 'active' : ''}">
         <div class="namashka-craft-token-header">
             <button class="close-button" on:click={toggleTokenInput}>
                 <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
@@ -79,8 +80,14 @@
 
 <style>
     .namashka-craft-token {
+        margin-top: 100vh;
         box-shadow: 0 0 10px var(--shadow-color);
         border-radius: 10px;
+        transition: margin-top 1s;
+    }
+
+    .namashka-craft-token.active {
+        margin-top: 0;
     }
 
     .namashka-craft-token-main {
