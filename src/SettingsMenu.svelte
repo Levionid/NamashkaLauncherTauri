@@ -1,7 +1,6 @@
 <script lang="ts">
     import { invoke } from '@tauri-apps/api/tauri';
 
-    export let toggleMainMenu: () => void;
     export let toggleSettingsMenu: () => void;
 
     export let launcherOptions: { [key: string]: string };
@@ -10,6 +9,7 @@
     export let jvmArguments: string;
     export let minJvmArgument: string;
     export let maxJvmArgument: string;
+    export let isSettingsOpen: boolean;
 
     function resetForm() {
         token = launcherOptions['token'] || "";
@@ -21,13 +21,11 @@
 
     function handleAccept() {
         saveLauncherOptions();
-        toggleMainMenu();
         toggleSettingsMenu();
     }
 
     function handleCancel() {
         resetForm();
-        toggleMainMenu();
         toggleSettingsMenu();
     }
 
@@ -47,47 +45,92 @@
 </script>
 
 <main>
-    <div class="settings-block">
-        <div class="token">
-            <div>Токен</div>
-            <input type="text" maxlength="70" placeholder="Введите токен" bind:value={token}>
+    <div class="settings-block {isSettingsOpen ? 'active' : ''}">
+        <div class="namashka-craft-settings-header">
+            <button class="close-button" on:click={handleCancel}>
+                <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.75 7.5125L21.9875 5.75L15 12.7375L8.0125 5.75L6.25 7.5125L13.2375 14.5L6.25 21.4875L8.0125 23.25L15 16.2625L21.9875 23.25L23.75 21.4875L16.7625 14.5L23.75 7.5125Z"/>
+                </svg>
+            </button>
         </div>
+        <div class="namashka-craft-settings-main">
+            <div class="settings-input-box">
+                <div class="namashka-craft-settings-name">Настройки</div>
+                <div class="token">
+                    <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder=" " bind:value={token}>
+                    <label class="namashka-craft-token-input-placeholder">Введите токен</label>
+                </div>
 
-        <div class="ram">
-            <div>Оперативная память (MB)</div>
-            <div class="ram-input">
-                Min
-                <input class="min" type="text" maxlength="5" bind:value={minJvmArgument}>
-                <span>-</span>  
-                Max
-                <input class="max" type="text" maxlength="5" bind:value={maxJvmArgument}>
+                <div class="ram">
+                    <div class="ram-name">Оперативная память (MB)</div>
+                    <div class="ram-input">
+                        <div class="min">
+                            <input class="min-box" type="text" placeholder=" " maxlength="5" bind:value={minJvmArgument}>
+                            <label class="min-box-placeholder">Min</label>
+                        </div>
+                        <span>-</span>
+                        <div class="max">
+                            <input class="max-box" type="text" placeholder=" " maxlength="5" bind:value={maxJvmArgument}>
+                            <label class="max-box-placeholder">Max</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button on:click={handleCancel} class="cancel">Отмена</button>
+                    <button on:click={handleAccept} class="accept">Принять</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="buttons">
-        <button on:click={handleCancel} class="cancel">Отмена</button>
-        <button on:click={handleAccept} class="accept">Принять</button>
     </div>
 </main>
 
 <style>
-    main {
-        display: flex;
-        margin: 0;
-    }
-    
     .settings-block {
-        margin-left: 2.92vw;
-        display: flex;
-        flex-direction: column;
-        align-items: start;
+        margin-top: 100vh;
+        box-shadow: 0 0 10px var(--shadow-color);
+        border-radius: 10px;
+        transition: margin-top 1s;
+    }
+
+    .settings-block.active {
+        margin-top: 0;
+    }
+
+    .namashka-craft-settings-main {
+        background-color: #2A2F32;
+        border-radius: 0 0 10px 10px;
+        width: 58.33vw;
+        height: calc(64.81vh - 40px);
+        text-align: center;
+    }
+
+    .namashka-craft-settings-header {
+        position: relative;
+        width: 58.33vw;
+        height: 40px;
+        background-color: #212429;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: rgba(0, 0, 0, 0);
+        cursor: pointer;
+        border-style: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        fill: white;
     }
 
     .token,
     .token input,
     .ram,
-    .min,
-    .max,
+    .min-box,
+    .max-box,
     .cancel,
     .accept {
         font-family: "Inter", sans-serif;
@@ -97,15 +140,85 @@
         font-variation-settings: "slnt" 0;
     }
 
+    .settings-input-box {
+        position: relative;
+        top: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .namashka-craft-settings-name {
+        position: relative;
+        color: #fff;
+        font-size: 40px;
+    }
+
     .token {
         position: relative;
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
         align-items: start;
-        margin-top: calc(10.56vh + var(--header-height));
+        flex-direction: column;
+        justify-content: center;
     }
 
-    .token div {
+    .namashka-craft-token-input {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
+    }
+
+    .namashka-craft-token-input:focus,
+    .namashka-craft-token-input:not(:placeholder-shown) {
+        border-color: #4390D8;
+    }
+
+    .namashka-craft-token-input {
+        position: relative;
+        width: 400px;
+        height: 40px;
+        top: 38px;
+        background-color: transparent;
+        outline: none;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
+        margin-bottom: 5.19vh;
+        color: var(--input-text-color);
+        text-align: left;
+        padding: 10px;
+        font-size: 16px;
+        transition: border-color .3s;
+        box-sizing: border-box;
+    }
+
+    .namashka-craft-token-input-placeholder {
+        position: relative;
+        width: 130px;
+        top: -20px;
+        left: 5px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        transition: color 0.3s, background-color 0.3s, transform 0.3s;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .namashka-craft-token-input:focus + .namashka-craft-token-input-placeholder,
+    .namashka-craft-token-input:not(:placeholder-shown) + .namashka-craft-token-input-placeholder {
+        color: #4390D8;
+        background-color: #2A2F32;
+        transform: translate(-10%, -98%) scale(80%);
+    }
+
+    /*.token div {
         color: #9A9A9A;
         font-size: 12px;
         font-weight: 600;
@@ -119,64 +232,141 @@
         background-color: #222628;
         border: none;
         border-radius: 6px;
-    }
+    }*/
 
     .ram {
         position: relative;
         display: flex;
         flex-direction: column;
-        align-items: start;
-        margin-top: 3.89vh;
+        align-items: center;
     }
 
-    .ram div {
+    .ram-name {
         color: #9A9A9A;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 600;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
 
     .ram-input {
         display: flex;
         flex-direction: row;
-        align-items: center;
-        font-size: 12px;
     }
 
     .ram-input span {
         font-size: 24px;
         margin: 0 10px 0 10px;
+        color: white;
+        margin-top: 5px;
     }
 
     .min {
-        width: 6.25vw;
-        height: 4.29vh;
-        color: #fff;
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
+    }
+
+    .min-box:focus,
+    .min-box:not(:placeholder-shown) {
+        border-color: #4390D8;
+    }
+
+    .min-box {
+        position: relative;
+        width: 100px;
+        height: 40px;
+        background-color: transparent;
+        outline: none;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
+        color: var(--input-text-color);
         text-align: center;
-        background-color: #222628;
-        border: none;
-        border-radius: 6px;
-        margin: 0 4px 0 4px;
+        font-size: 16px;
+        transition: .3s;
+        box-sizing: border-box;
+    }
+
+    .min-box-placeholder {
+        position: relative;
+        width: 40px;
+        top: -30px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        transition: 0.3s;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .min-box:focus + .min-box-placeholder,
+    .min-box:not(:placeholder-shown) + .min-box-placeholder {
+        color: #4390D8;
+        background-color: #2A2F32;
+        transform: translate(-70%, -98%) scale(80%);
     }
 
     .max {
-        width: 6.25vw;
-        height: 4.29vh;
-        color: #fff;
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
+    }
+
+    .max-box:focus,
+    .max-box:not(:placeholder-shown) {
+        border-color: #4390D8;
+    }
+
+    .max-box {
+        position: relative;
+        width: 100px;
+        height: 40px;
+        background-color: transparent;
+        outline: none;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
+        color: var(--input-text-color);
         text-align: center;
-        background-color: #222628;
-        border: none;
-        border-radius: 6px;
-        margin: 0 4px 0 4px;
+        font-size: 16px;
+        transition: .3s;
+        box-sizing: border-box;
+    }
+
+    .max-box-placeholder {
+        position: relative;
+        width: 40px;
+        top: -30px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        transition: 0.3s;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .max-box:focus + .max-box-placeholder,
+    .max-box:not(:placeholder-shown) + .max-box-placeholder {
+        color: #4390D8;
+        background-color: #2A2F32;
+        transform: translate(-70%, -98%) scale(80%);
     }
 
     .buttons {
-        position: fixed;
+        position: absolute;
         display: flex;
         flex-direction: row;
         align-items: center;
-        right: 1.35vw;
-        bottom: 2.41vh;
+        gap: 1.67vw;
+        top: 43.41vh;
     }
     
     .cancel {
@@ -186,12 +376,10 @@
         color: #4390D8;
         font-size: 18px;
         user-select: none;
-        text-shadow: 0 4px 4px var(--shadow-color);
         border-radius: 10px;
         border-style: solid;
         border-width: 2px;
         border-color: #4390D8;
-        margin-right: 1.67vw;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;
     }
 
@@ -209,7 +397,6 @@
         color: #fff;
         font-size: 18px;
         user-select: none;
-        text-shadow: 0 4px 4px var(--shadow-color);
         border: none;
         border-radius: 10px;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;

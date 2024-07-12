@@ -3,12 +3,8 @@
 
   import Header from '../src/Header.svelte';
   import MainMenu from './MainMenu.svelte';
-  import SettingsMenu from './SettingsMenu.svelte';
 
   import { invoke } from '@tauri-apps/api/tauri';
-
-  export let isMenuOpen = true;
-  export let isSettingsOpen = false;
 
   let launcherOptions: { [key: string]: string } = {};
   let token: string = "";
@@ -21,6 +17,7 @@
   async function checkLauncherOptions() {
     try {
       launcherOptionsExists = await invoke('check_launcher_options');
+      console.log(launcherOptionsExists);
       if (launcherOptionsExists) {
         launcherOptions = await invoke<{ [key: string]: string }>('read_launcher_options');
         console.log("Launcher options:", launcherOptions);
@@ -57,14 +54,6 @@
     };
   }
 
-  function toggleMainMenu() {
-    isMenuOpen = !isMenuOpen;
-  }
-
-  function toggleSettingsMenu() {
-    isSettingsOpen = !isSettingsOpen;
-  }
-
   onMount(() => {
     checkLauncherOptions();
   });
@@ -76,29 +65,15 @@
   <div class="border-left"></div>
   <div class="border-right"></div>
   <Header />
-  {#if isMenuOpen}
-    <MainMenu 
-      {checkLauncherOptions}
-      {toggleMainMenu} 
-      {toggleSettingsMenu} 
-      {launcherOptions} 
-      {token} 
-      {username} 
-      {jvmArguments} 
-      {minJvmArgument} 
-      {maxJvmArgument} 
-      {launcherOptionsExists} />
-  {:else if isSettingsOpen}
-    <SettingsMenu 
-      {toggleMainMenu} 
-      {toggleSettingsMenu} 
-      {launcherOptions} 
-      {token} 
-      {username} 
-      {jvmArguments} 
-      {minJvmArgument} 
-      {maxJvmArgument} />
-  {/if}
+  <MainMenu 
+    {checkLauncherOptions}
+    {launcherOptions} 
+    {token} 
+    {username} 
+    {jvmArguments} 
+    {minJvmArgument} 
+    {maxJvmArgument} 
+    {launcherOptionsExists} />
 </main>
 
 <style>

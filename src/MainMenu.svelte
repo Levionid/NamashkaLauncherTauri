@@ -3,6 +3,7 @@
     import { invoke } from '@tauri-apps/api/tauri';
 
     import TokenInputMenu from './TokenInputMenu.svelte';
+    import SettingsMenu from './SettingsMenu.svelte';
 
     import namashkaCraftImage1201 from '../src-tauri/assets/namashkaCraftImage1201.png';
     import namashkaCraftImageLite121 from '../src-tauri/assets/namashkaCraftImageLite121.png';
@@ -10,10 +11,6 @@
     import logoImage from '../src-tauri/assets/namashkaLogo.png';
 
     export let checkLauncherOptions: () => void;
-    export let toggleMainMenu: () => void;
-    export let toggleSettingsMenu: () => void;
-
-    let showTokenInput: boolean = false;
 
     export let launcherOptions: { [key: string]: string };
     export let token: string;
@@ -22,6 +19,9 @@
     export let minJvmArgument: string;
     export let maxJvmArgument: string;
     export let launcherOptionsExists: boolean;
+
+    let showTokenInput: boolean = false;
+    let isSettingsOpen: boolean = false;
 
     let selectedImage: string = namashkaCraftImage1201;
     let selectedName: string = "NamashkaCraft";
@@ -163,6 +163,10 @@
         return false;
     }
 
+    function toggleSettingsMenu() {
+        isSettingsOpen = !isSettingsOpen;
+    }
+
     onMount(() => {
         setInitialSelectedElement();
     });
@@ -195,6 +199,9 @@
     <div class="overlay {showTokenInput ? 'active' : ''}">
         <TokenInputMenu {toggleTokenInput} {toggleLauncherOptionsExists} {setInitialSelectedElement}  {token} {minJvmArgument} {maxJvmArgument} {showTokenInput}/>
     </div>
+    <div class="overlay {isSettingsOpen ? 'active' : ''}">
+        <SettingsMenu {toggleSettingsMenu} {launcherOptions} {token}{username} {jvmArguments} {minJvmArgument} {maxJvmArgument} {isSettingsOpen} />
+    </div>
     <aside class="namashka-craft-tab {launcherOptionsExists ? 'active' : 'passive'}">
         <div class="namashka-craft">
             <img class="namashka-craft-tab-image" src={selectedImage} alt="Selected Image">
@@ -205,20 +212,20 @@
         </div>
         <div class="namashka-craft-user-box">
             <div class="namashka-craft-username-input">
-                <input class="namashka-craft-username-input-box" type="text" maxlength="23" placeholder=" " value={username} disabled={!launcherOptionsExists}>
+                <input class="namashka-craft-username-input-box" type="text" maxlength="23" placeholder=" " value={username}>
                 <label class="namashka-craft-username-input-box-placeholder">Введите ник</label>
             </div>
-            <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} disabled={!launcherOptionsExists}>Играть</button>
+            <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername}>Играть</button>
             <div class="error-feedback"></div>
         </div>
         <div class="buttons">
-            <button on:click={openExplorer} disabled={!launcherOptionsExists} class="button-container">
+            <button on:click={openExplorer} class="button-container">
                 <svg class="folder-button" id="folder-button" viewBox="0 0 21 17" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8.41665 0.166687H2.16665C1.02081 0.166687 0.0937296 1.10419 0.0937296 2.25002L0.083313 14.75C0.083313 15.8959 1.02081 16.8334 2.16665 16.8334H18.8333C19.9791 16.8334 20.9166 15.8959 20.9166 14.75V4.33335C20.9166 3.18752 19.9791 2.25002 18.8333 2.25002H10.5L8.41665 0.166687Z"/>
                 </svg>
             </button>
             
-            <button on:click={checkLauncherOptions} on:click={toggleSettingsMenu} on:click={toggleMainMenu} disabled={!launcherOptionsExists} class="button-container">
+            <button on:click={checkLauncherOptions} on:click={toggleSettingsMenu} class="button-container">
                 <svg class="settings-button" id="settings-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
                     <path id="icon_path" d="M17.9375 11.4792C17.9792 11.1667 18 10.8438 18 10.5C18 10.1667 17.9792 9.83333 17.9271 9.52083L20.0417 7.875C20.2292 7.72917 20.2813 7.44792 20.1667 7.23958L18.1667 3.78125C18.0417 3.55208 17.7813 3.47917 17.5521 3.55208L15.0625 4.55208C14.5417 4.15625 13.9896 3.82292 13.375 3.57292L13 0.927083C12.9584 0.677083 12.75 0.5 12.5 0.5H8.50003C8.25003 0.5 8.05212 0.677083 8.01045 0.927083L7.63545 3.57292C7.02087 3.82292 6.45837 4.16667 5.94795 4.55208L3.45837 3.55208C3.2292 3.46875 2.96878 3.55208 2.84378 3.78125L0.8542 7.23958C0.7292 7.45833 0.770866 7.72917 0.979199 7.875L3.09378 9.52083C3.0417 9.83333 3.00003 10.1771 3.00003 10.5C3.00003 10.8229 3.02087 11.1667 3.07295 11.4792L0.958366 13.125C0.770866 13.2708 0.718783 13.5521 0.833366 13.7604L2.83337 17.2188C2.95837 17.4479 3.21878 17.5208 3.44795 17.4479L5.93753 16.4479C6.45837 16.8437 7.01045 17.1771 7.62503 17.4271L8.00003 20.0729C8.05212 20.3229 8.25003 20.5 8.50003 20.5H12.5C12.75 20.5 12.9584 20.3229 12.9896 20.0729L13.3646 17.4271C13.9792 17.1771 14.5417 16.8437 15.0521 16.4479L17.5417 17.4479C17.7709 17.5312 18.0313 17.4479 18.1563 17.2188L20.1563 13.7604C20.2813 13.5312 20.2292 13.2708 20.0313 13.125L17.9375 11.4792ZM10.5 14.25C8.43753 14.25 6.75003 12.5625 6.75003 10.5C6.75003 8.4375 8.43753 6.75 10.5 6.75C12.5625 6.75 14.25 8.4375 14.25 10.5C14.25 12.5625 12.5625 14.25 10.5 14.25Z"/>
                 </svg>
@@ -498,10 +505,6 @@
         font-variation-settings: "slnt" 0;
     }
     
-    .namashka-craft-play-button:disabled {
-        background-color: #999999;
-    }
-    
     .namashka-craft-play-button:enabled:hover {
         background-position: 0%;
         cursor: pointer;
@@ -566,8 +569,6 @@
         visibility: visible;
         background-color: rgba(0, 0, 0, 0.25);
     }
-
-    
 
     .main-img-content-container {
         opacity: 0;
