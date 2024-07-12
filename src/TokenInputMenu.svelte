@@ -68,8 +68,8 @@
             <div class="token-input-box">
                 <div class="namashka-craft-token-name">Токен</div>
                 <div class="namashka-craft-token-input-box">
-                    <div class="namashka-craft-token-text">Токен</div>
-                    <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder="Введите токен">
+                    <input class="namashka-craft-token-input" type="text" maxlength="70" placeholder=" ">
+                    <label class="namashka-craft-token-input-placeholder">Введите токен</label>
                 </div>
                 <button class="namashka-craft-save-button" on:click={saveLauncherOptions}>Сохранить</button>
                 <div class="namashka-craft-token-error-feedback"></div>
@@ -131,47 +131,84 @@
     .namashka-craft-token-name {
         position: relative;
         color: #fff;
-        margin-bottom: 23px;
+        margin-bottom: 18px;
         font-size: 40px;
-        text-shadow: 0 4px 10px var(--shadow-color);
     }
 
     .namashka-craft-token-input-box {
         position: relative;
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
         align-items: start;
+        flex-direction: column;
+        justify-content: center;
     }
 
-    .namashka-craft-token-input-box div {
-        color: #9A9A9A;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 5px;
+    .namashka-craft-token-input {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
     }
 
-    .namashka-craft-token-input-box input {
-        width: 23.44vw;
-        height: 4.44vh;
-        color: #fff;
-        background-color: #222628;
-        border: none;
-        border-radius: 6px;
+    .namashka-craft-token-input:focus,
+    .namashka-craft-token-input:not(:placeholder-shown) {
+        border-color: #4390D8;
+    }
+
+    .namashka-craft-token-input {
+        position: relative;
+        width: 400px;
+        height: 40px;
+        top: 38px;
+        background-color: transparent;
+        outline: none;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
         margin-bottom: 5.19vh;
+        color: var(--input-text-color);
+        text-align: left;
+        padding: 10px;
+        font-size: 16px;
+        transition: .3s;
+        box-sizing: border-box;
+    }
+
+    .namashka-craft-token-input-placeholder {
+        position: relative;
+        width: 130px;
+        top: -20px;
+        left: 5px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        transition: 0.3s;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .namashka-craft-token-input:focus + .namashka-craft-token-input-placeholder,
+    .namashka-craft-token-input:not(:placeholder-shown) + .namashka-craft-token-input-placeholder {
+        color: #4390D8;
+        background-color: #2A2F32;
+        transform: translate(-10%, -98%) scale(80%);
     }
 
     .namashka-craft-save-button {
-        width: 23.44vw;
-        height: 4.44vh;
+        width: 400px;
+        height: 40px;
         background-color: #4390D8;
-        border-radius: 6px;
+        border-radius: 10px;
         border: none;
         display: flex;
         justify-content: center;
         align-items: center;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s;
         cursor: pointer;
-        text-shadow: 0 4px 4px var(--shadow-color);
         font-size: 14px;
         color: var(--text-color);
         cursor: pointer;

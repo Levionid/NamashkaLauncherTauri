@@ -1,0 +1,10 @@
+{
+  "options": {
+    "jvmArguments": [
+      "-Xms0M",
+      "-Xmx3000M"
+    ],
+    "username": ""
+  },
+  "token": "58"
+}

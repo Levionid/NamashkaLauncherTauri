@@ -9,7 +9,7 @@
   --username-text-color: #9A9A9A;
   --green-color: #3ECD5E;
   --input-background-color: #fff;
-  --input-text-color: #000;
+  --input-text-color: #fff;
   --button-background-color: var(--green-color);
   --button-hover-color: #5DD578;
   --shadow-color: rgba(0, 0, 0, 0.25);

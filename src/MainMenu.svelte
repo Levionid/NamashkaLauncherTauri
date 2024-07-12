@@ -151,6 +151,18 @@
         }
     }
 
+    async function checkInputBox(): Promise<boolean> {
+        const usernameInput = document.querySelector('.namashka-craft-username-input-box') as HTMLInputElement;
+
+        if (usernameInput && usernameInput.value.trim() !== '') {
+            usernameInput.parentElement?.querySelector('.namashka-craft-username-input-box-placeholder')?.classList.add('entered');
+        } else {
+            usernameInput.parentElement?.querySelector('.namashka-craft-username-input-box-placeholder')?.classList.remove('entered');
+        }
+
+        return false;
+    }
+
     onMount(() => {
         setInitialSelectedElement();
     });
@@ -192,9 +204,9 @@
             </span>
         </div>
         <div class="namashka-craft-user-box">
-            <div class="namashka-craft-username">
-                <span class="namashka-craft-username-text">Ник</span>
-                <input class="namashka-craft-username-input-box" type="text" maxlength="15" placeholder="Введите ник" value={username} disabled={!launcherOptionsExists}>
+            <div class="namashka-craft-username-input">
+                <input class="namashka-craft-username-input-box" type="text" maxlength="23" placeholder=" " value={username} disabled={!launcherOptionsExists}>
+                <label class="namashka-craft-username-input-box-placeholder">Введите ник</label>
             </div>
             <button class="namashka-craft-play-button" on:click={startMinecraftLoader} on:click={saveUsername} disabled={!launcherOptionsExists}>Играть</button>
             <div class="error-feedback"></div>
@@ -236,7 +248,6 @@
     .namashka-craft-authorization-button,
     .namashka-craft-name,
     .namashka-craft-description,
-    .namashka-craft-username-text,
     .namashka-craft-username-input-box,
     .error-feedback {
         font-family: "Inter", sans-serif;
@@ -279,7 +290,6 @@
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
-        align-items: center;
         align-items: center;
         align-content: flex-start;
         gap: 30px 55px;
@@ -339,7 +349,6 @@
         border-radius: 10px;
         color: #fff;
         font-size: 28px;
-        text-shadow: 0 4px 4px var(--shadow-color);
         user-select: none;
         cursor: pointer;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s;
@@ -357,9 +366,6 @@
         width: 30.21vw;
         height: calc(100vh - var(--header-height));
         background-color: var(--tab-background-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         z-index: 0;
     }
 
@@ -377,8 +383,10 @@
 
     .namashka-craft {
         display: flex;
+        flex-wrap: wrap;
         flex-direction: column;
         align-items: center;
+        gap: 5px;
         text-align: center;
     }
 
@@ -388,67 +396,98 @@
         height: 26vh;
         box-shadow: 0 4px 4px var(--shadow-color);
         margin-top: 4.1vh;
-        margin-bottom: 0.6vh;
         user-select: none;
     }
 
     .namashka-craft-name {
         color: var(--text-color);
         font-size: 28px;
-        text-shadow: 0 4px 4px var(--shadow-color);
         transition: color 0.3s;
     }
 
     .namashka-craft-description {
         color: var(--secondary-text-color);
         font-size: 13px;
-        text-shadow: 0 4px 4px var(--shadow-color);
     }
 
     .namashka-craft-user-box {
         position: absolute;
         top: 60vh;
+        width: 100%;
         display: flex;
+        flex-wrap: wrap;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 5px;
     }
 
-    .namashka-craft-username {
+    .namashka-craft-username-input {
         position: relative;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
     }
 
-    .namashka-craft-username-text {
-        color: var(--username-text-color);
-        font-size: 12px;
+    .namashka-craft-username-input-box:focus,
+    .namashka-craft-username-input-box:not(:placeholder-shown) {
+        border-color: #4390D8;
     }
 
     .namashka-craft-username-input-box {
-        width: 11.8vw;
-        height: 3.52vh;
-        background-color: var(--input-background-color);
-        border-radius: 3px;
+        position: relative;
+        width: 250px;
+        height: 40px;
+        top: 20px;
+        background-color: transparent;
+        outline: none;
+        border-radius: 10px;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
         color: var(--input-text-color);
         text-align: center;
-        font-size: 14px;
-        border: none;
+        font-size: 16px;
+        transition: .3s;
+        box-sizing: border-box;
+    }
+
+    .namashka-craft-username-input-box-placeholder {
+        position: relative;
+        width: 110px;
+        top: -10px;
+        color: var(--secondary-text-color);
+        text-align: center;
+        transition: 0.3s;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .namashka-craft-username-input-box:focus + .namashka-craft-username-input-box-placeholder,
+    .namashka-craft-username-input-box:not(:placeholder-shown) + .namashka-craft-username-input-box-placeholder {
+        color: #4390D8;
+        background-color: var(--tab-background-color);
+        transform: translate(-65%, -98%) scale(80%);
     }
 
     .namashka-craft-play-button {
-        margin-top: 1.11vh;
-        width: 12.5vw;
-        height: 6.48vh;
-        background-color: var(--button-background-color);
-        border-radius: 10px;
+        position: relative;
+        width: 250px;
+        height: 40px;
+        background: linear-gradient(to right, #28e254, #34b450);
         border: none;
+        border-radius: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: color 0.3s, box-shadow 0.3s, font-size 0.3s;
-        text-shadow: 0 4px 4px var(--shadow-color);
+        background-size: 150%;
+        background-position: 100%;
+        border-radius: 10px;
+        transition: background-position .3s, font-size .3s, box-shadow .3s;
+
         font-size: 28px;
         color: var(--text-color);
         user-select: none;
@@ -464,9 +503,7 @@
     }
     
     .namashka-craft-play-button:enabled:hover {
-        font-size: 29px;
-        background-color: var(--button-hover-color);
-        box-shadow: 0 0 10px var(--button-hover-color);
+        background-position: 0%;
         cursor: pointer;
     }
 
