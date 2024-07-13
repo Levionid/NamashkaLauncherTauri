@@ -201,7 +201,7 @@
 
     .namashka-craft-token-input-placeholder {
         position: relative;
-        width: 130px;
+        width: 125px;
         top: -20px;
         left: 5px;
         color: var(--secondary-text-color);
@@ -215,24 +215,8 @@
     .namashka-craft-token-input:not(:placeholder-shown) + .namashka-craft-token-input-placeholder {
         color: #4390D8;
         background-color: #2A2F32;
-        transform: translate(-10%, -98%) scale(80%);
+        transform: translate(-8%, -98%) scale(80%);
     }
-
-    /*.token div {
-        color: #9A9A9A;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .token input {
-        width: 52.08vw;
-        height: 4.29vh;
-        color: #fff;
-        background-color: #222628;
-        border: none;
-        border-radius: 6px;
-    }*/
 
     .ram {
         position: relative;
@@ -307,7 +291,7 @@
     .min-box:not(:placeholder-shown) + .min-box-placeholder {
         color: #4390D8;
         background-color: #2A2F32;
-        transform: translate(-70%, -98%) scale(80%);
+        transform: translate(-65%, -98%) scale(80%);
     }
 
     .max {
@@ -357,7 +341,7 @@
     .max-box:not(:placeholder-shown) + .max-box-placeholder {
         color: #4390D8;
         background-color: #2A2F32;
-        transform: translate(-70%, -98%) scale(80%);
+        transform: translate(-65%, -98%) scale(80%);
     }
 
     .buttons {

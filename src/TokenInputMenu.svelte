@@ -181,7 +181,7 @@
 
     .namashka-craft-token-input-placeholder {
         position: relative;
-        width: 130px;
+        width: 125px;
         top: -20px;
         left: 5px;
         color: var(--secondary-text-color);
@@ -195,7 +195,7 @@
     .namashka-craft-token-input:not(:placeholder-shown) + .namashka-craft-token-input-placeholder {
         color: #4390D8;
         background-color: #2A2F32;
-        transform: translate(-10%, -98%) scale(80%);
+        transform: translate(-8%, -98%) scale(80%);
     }
 
     .namashka-craft-save-button {
