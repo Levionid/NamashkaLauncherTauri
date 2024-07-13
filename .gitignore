@@ -38,3 +38,5 @@ Cargo.lock
 *.pdb
 
 src-tauri/target/
+src-tauri/launcherOptions.txt
+src-tauri/minecraftLoader.exe
