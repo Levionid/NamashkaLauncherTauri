@@ -314,7 +314,7 @@
         margin: 0 auto;
         border-radius: 15px;
         box-shadow: 0 4px 4px var(--shadow-color);
-        transition: 0.3s;
+        transition: box-shadow .3s;
     }
     
     .main-img-content {
@@ -324,6 +324,7 @@
         justify-content: center;
         text-align: center;
         user-select: none;
+        cursor: pointer;
         transition: transform .3s;
     }
     

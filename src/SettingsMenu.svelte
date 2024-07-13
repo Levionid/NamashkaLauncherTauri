@@ -364,6 +364,7 @@
         border-style: solid;
         border-width: 2px;
         border-color: #4390D8;
+        cursor: pointer;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;
     }
 
@@ -383,6 +384,7 @@
         user-select: none;
         border: none;
         border-radius: 10px;
+        cursor: pointer;
         transition: color 0.3s, box-shadow 0.3s, font-size 0.3s, background-color 0.3s, border-color 0.3s;
     }
 
