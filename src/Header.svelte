@@ -57,6 +57,7 @@
     .titlebar-image {
         height: 45px;
         margin: 5px;
+        pointer-events: none;
     }
     
     .titlebar-name {
@@ -105,6 +106,11 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .titlebar-button-close img {
+        user-select: none;
+        pointer-events: none;
     }
 
     .titlebar-button-close:hover {

@@ -314,6 +314,7 @@
         margin: 0 auto;
         border-radius: 15px;
         box-shadow: 0 4px 4px var(--shadow-color);
+        pointer-events: none;
         transition: box-shadow .3s;
     }
     
@@ -405,6 +406,7 @@
         box-shadow: 0 4px 4px var(--shadow-color);
         margin-top: 4.1vh;
         user-select: none;
+        pointer-events: none;
     }
 
     .namashka-craft-name {
@@ -438,6 +440,7 @@
         align-items: center;
         justify-items: center;
         justify-content: center;
+        user-select: none;
     }
 
     .namashka-craft-username-input-box:focus,
