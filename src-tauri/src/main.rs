@@ -126,7 +126,7 @@ fn check_launcher_options() -> bool {
 
 fn main() {
     Builder::default()
-        .setup(|app| {
+        /*.setup(|app| {
             let window = app.get_window("main").unwrap();
             
             #[cfg(any(windows, target_os = "macos"))]
@@ -136,7 +136,7 @@ fn main() {
             apply_blur(&window, Some((42, 47, 50, 200)))
                 .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
             Ok(())
-        })
+        })*/
         .invoke_handler(generate_handler![open_explorer,
              start_minecraft_loader,
              check_launcher_options,
