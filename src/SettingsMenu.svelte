@@ -350,7 +350,7 @@
         flex-direction: row;
         align-items: center;
         gap: 1.67vw;
-        top: 43.41vh;
+        top: 42.41vh;
     }
     
     .cancel {
