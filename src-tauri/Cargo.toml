@@ -21,6 +21,7 @@ tauri = { version = "1.5.4", features = [ "shell-execute", "window-minimize", "w
 tokio = { version = "1", features = ["full"] }
 window-vibrancy = "0.4.3"
 window-shadows = "0.2"
+sys-info = "0.9"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

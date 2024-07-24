@@ -2,7 +2,7 @@
   "options": {
     "jvmArguments": [
       "-Xms0M",
-      "-Xmx3000M"
+      "-Xmx9000M"
     ],
     "username": ""
   },

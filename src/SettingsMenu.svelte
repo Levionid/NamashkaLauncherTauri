@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { invoke } from '@tauri-apps/api/tauri';
 
     export let toggleSettingsMenu: () => void;
-
     export let launcherOptions: { [key: string]: string };
     export let token: string;
     export let username: string;
@@ -11,12 +11,39 @@
     export let maxJvmArgument: string;
     export let isSettingsOpen: boolean;
 
+    let maxRAM: number = 0;
+
+    async function fetchRamSize() {
+        try {
+            let ramSize: number = await invoke("get_ram_size");
+            maxRAM = Math.floor(ramSize / 1024) * 1024; // Преобразуем в мегабайты
+        } catch (error) {
+            console.error(`Failed to get RAM size: ${error}`);
+        }
+    }
+
     function resetForm() {
         token = launcherOptions['token'] || "";
         jvmArguments = launcherOptions['jvmArguments'] || "";
         const jvmArgsArray = jvmArguments.split(" ");
         minJvmArgument = jvmArgsArray[0] || "";
         maxJvmArgument = jvmArgsArray[1] || "";
+    }
+
+    async function saveLauncherOptions() {
+        try {
+            const textInput = document.querySelector(".max-box") as HTMLInputElement;
+            maxJvmArgument = textInput.value;
+            await invoke('save_launcher_options', { 
+                username: username,
+                token: token, 
+                minJvmArgument: minJvmArgument,
+                maxJvmArgument: maxJvmArgument
+            });
+            console.log('Launcher options saved successfully.');
+        } catch (error) {
+            console.error('Failed to save launcher options:', error);
+        }
     }
 
     function handleAccept() {
@@ -29,19 +56,10 @@
         toggleSettingsMenu();
     }
 
-    async function saveLauncherOptions() {
-        try {
-            await invoke('save_launcher_options', { 
-                username: username,
-                token: token, 
-                minJvmArgument: minJvmArgument,
-                maxJvmArgument: maxJvmArgument
-            });
-            console.log('Launcher options saved successfully.');
-        } catch (error) {
-            console.error('Failed to save launcher options:', error);
-        }
-    }
+    // Инициализация значений
+    onMount(async () => {
+        await fetchRamSize();
+    });
 </script>
 
 <main>
@@ -64,16 +82,11 @@
                 <div class="ram">
                     <div class="ram-name">Оперативная память (MB)</div>
                     <div class="ram-input">
-                        <div class="min">
-                            <input class="min-box" type="text" placeholder=" " maxlength="5" bind:value={minJvmArgument}>
-                            <label class="min-box-placeholder">Min</label>
-                        </div>
-                        <span>-</span>
+                        <input class="ram-range" type="range" min="0" max={maxRAM} step="1000" bind:value={maxJvmArgument}>
                         <div class="max">
                             <input class="max-box" type="text" placeholder=" " maxlength="5" bind:value={maxJvmArgument}>
-                            <label class="max-box-placeholder">Max</label>
+                            <label class="max-box-placeholder">RAM</label>
                         </div>
-
                     </div>
                 </div>
                 <div class="buttons">
@@ -129,7 +142,6 @@
     .token,
     .token input,
     .ram,
-    .min-box,
     .max-box,
     .cancel,
     .accept {
@@ -229,79 +241,31 @@
         color: #9A9A9A;
         font-size: 14px;
         font-weight: 600;
-        margin-bottom: 10px;
     }
 
     .ram-input {
         display: flex;
         flex-direction: row;
+        width: 400px;
     }
 
-    .ram-input span {
-        font-size: 24px;
-        margin: 0 10px 0 10px;
-        color: white;
-        margin-top: 5px;
+    .ram-range {
+        width: 70%;
     }
 
-    .min {
-        position: relative;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-items: center;
-        justify-content: center;
-    }
-
-    .min-box:focus,
-    .min-box:not(:placeholder-shown) {
-        border-color: #4390D8;
-    }
-
-    .min-box {
-        position: relative;
-        width: 100px;
-        height: 40px;
-        background-color: transparent;
-        outline: none;
-        border-radius: 10px;
-        border-color: white;
-        border-width: 1px;
-        border-style: solid;
-        color: var(--input-text-color);
-        text-align: center;
-        font-size: 16px;
-        transition: .3s;
-        box-sizing: border-box;
-    }
-
-    .min-box-placeholder {
-        position: relative;
-        width: 40px;
-        top: -30px;
-        color: var(--secondary-text-color);
-        text-align: center;
-        transition: 0.3s;
-        user-select: none;
-        pointer-events: none;
-    }
-
-    .min-box:focus + .min-box-placeholder,
-    .min-box:not(:placeholder-shown) + .min-box-placeholder {
-        color: #4390D8;
-        background-color: #2A2F32;
-        transform: translate(-65%, -98%) scale(80%);
+    .ram-range::-webkit-slider-thumb {
+        cursor: pointer;
     }
 
     .max {
         position: relative;
-        width: 100%;
+        width: 30%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-items: center;
         justify-content: center;
+        top: 8px;
     }
 
     .max-box:focus,

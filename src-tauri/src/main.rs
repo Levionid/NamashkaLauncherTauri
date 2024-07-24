@@ -6,6 +6,7 @@ use std::thread;
 use tauri::{Manager, Window};
 use tauri::{generate_handler, Builder};
 use std::fs;
+use sys_info;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -124,6 +125,14 @@ fn check_launcher_options() -> bool {
     fs::metadata("./launcherOptions.txt").is_ok()
 }
 
+#[tauri::command]
+fn get_ram_size() -> Result<u64, String> {
+    match sys_info::mem_info() {
+        Ok(mem_info) => Ok(mem_info.total / 1024), // Преобразование из килобайтов в мегабайты
+        Err(e) => Err(format!("Failed to get RAM size: {}", e)),
+    }
+}
+
 fn main() {
     Builder::default()
         /*.setup(|app| {
@@ -141,7 +150,8 @@ fn main() {
              start_minecraft_loader,
              check_launcher_options,
              read_launcher_options,
-             save_launcher_options])
+             save_launcher_options,
+             get_ram_size])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
